@@ -1,0 +1,10 @@
+// 2026-10 日報裡的練習預測：d 日報日期、s 代號、base 從哪一天的收盤算起、h 幾個交易日、dir 方向、conf 把握（%）。
+// 由 tools/us-daily.js add-report 從日報抽出來，不用手改。
+(window.US_CALLS = window.US_CALLS || []).push([
+{"d":"2026-10-26","s":"AAPL","base":"2026-10-23","h":5,"dir":"flat","conf":45},
+{"d":"2026-10-26","s":"COST","base":"2026-10-23","h":5,"dir":"flat","conf":50},
+{"d":"2026-10-26","s":"GOOG","base":"2026-10-23","h":5,"dir":"up","conf":40},
+{"d":"2026-10-26","s":"NVDA","base":"2026-10-23","h":5,"dir":"down","conf":40},
+{"d":"2026-10-26","s":"SPY","base":"2026-10-23","h":5,"dir":"flat","conf":70},
+{"d":"2026-10-26","s":"TSLA","base":"2026-10-23","h":5,"dir":"up","conf":40}
+]);
