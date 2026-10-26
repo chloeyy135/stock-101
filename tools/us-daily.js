@@ -64,21 +64,26 @@ function addBars(jsonFile) {
   const input = JSON.parse(fs.readFileSync(jsonFile, 'utf8'));
   const { idx, T, bars } = world();
   const ok = new Set(T.SYMBOLS.map((s) => s.id));
+  // 種子檔（seed-*.js）不再改；之後的日子都放月檔，重抓到已經有的日子就用新的數字蓋過去（例如成交量事後修正）
+  const seeds = T.collect(load(idx.files.filter((f) => f.startsWith('seed-')).map((f) => path.join(DIR, f))));
   const byMonth = {};
-  let added = 0;
+  let added = 0, updated = 0;
   for (const id of Object.keys(input)) {
     if (!ok.has(id)) throw new Error('不認識的代號：' + id);
     const list = Array.isArray(input[id]) ? input[id] : input[id].history;
-    const known = bars[id] || [];
-    const last = known.length ? known[known.length - 1].d : '';
+    const seedList = seeds[id] || [];
+    const seedLast = seedList.length ? seedList[seedList.length - 1].d : '';
+    const known = new Map((bars[id] || []).map((x) => [x.d, x]));
     for (const b of list) {
       const row = [b.date, b.open, b.high, b.low, b.close, b.volume];
       if (!/^\d{4}-\d\d-\d\d$/.test(row[0]) || row.slice(1).some((x) => typeof x !== 'number' || !isFinite(x))) throw new Error('格式不對：' + id + ' ' + JSON.stringify(b));
       if (!(row[2] >= Math.max(row[1], row[4]) && row[3] <= Math.min(row[1], row[4]) && row[3] > 0)) throw new Error('高低價不合理：' + id + ' ' + JSON.stringify(b));
-      if (row[0] <= last) continue;
+      if (row[0] <= seedLast) continue;
+      const old = known.get(row[0]);
+      if (old && old.o === row[1] && old.h === row[2] && old.l === row[3] && old.c === row[4] && old.v === row[5]) continue;
+      if (old) updated++; else added++;
       const m = row[0].slice(0, 7);
       ((byMonth[m] = byMonth[m] || {})[id] = byMonth[m][id] || []).push(row);
-      added++;
     }
   }
   for (const m of Object.keys(byMonth)) {
@@ -97,7 +102,7 @@ function addBars(jsonFile) {
     console.log('寫入', path.relative(ROOT, file));
   }
   writeIndex(idx);
-  console.log('新增', added, '根 K 線');
+  console.log('新增', added, '根 K 線' + (updated ? '，更新 ' + updated + ' 根' : ''));
 }
 
 const DIRS = ['up', 'down', 'flat'];
