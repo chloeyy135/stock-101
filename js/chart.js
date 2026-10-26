@@ -1,6 +1,6 @@
-/* 台股入門 60 天 — 看盤指南：指標實驗室
-   用電腦產生的示意走勢畫 K 線、均線、布林通道、成交量、MACD、KD、RSI，
-   點一根 K 線就用白話說明每個指標在講什麼。資料不是任何真實股票。 */
+/* 台股入門 60 天 — 指標實驗室
+   畫 K 線、均線、布林通道、成交量、MACD、KD、RSI，點一根 K 線就用白話說明每個指標在講什麼。
+   看盤指南用電腦產生的示意走勢；美股日報（#lab 加上 data-external）改由 trend.js 用 StockChart.load() 給真實資料。 */
 (function () {
   'use strict';
 
@@ -10,12 +10,17 @@
   var MA = [5, 20, 60];
   var RSI = [6, 12];
 
+  // 指標計算不需要畫面，先給別的檔案用（美股日報、tools/us-daily.js）
+  window.StockChart = { sma: sma, ema: ema, boll: boll, macd: macd, kd: kd, rsi: rsi, series: series, toWeekly: toWeekly, weeklyByDate: weeklyByDate, makeDaily: makeDaily, MA: MA, RSI: RSI };
+
   var root = document.getElementById('lab');
   if (!root) return;
 
+  var external = root.hasAttribute('data-external');
   var state = { seed: 20261026, period: 'day', main: 'ma', sub: 'vol', color: 'tw', sel: -1 };
   var data = null;   // { day: series, week: series }
   var geom = null;   // 最近一次畫圖的版面，點選時用來換算是哪一根
+  var label = '';    // 真實資料的名稱，例如「TSLA 特斯拉」
 
   function el(id) { return document.getElementById(id); }
 
@@ -75,6 +80,22 @@
       }
       out.push(w);
     }
+    return out;
+  }
+
+  // 真實資料的週 K：同一個星期（週一到週五）的日 K 合成一根，日期記那週最後一個交易日
+  function weeklyByDate(days) {
+    var out = [], cur = null, key = null;
+    days.forEach(function (b) {
+      var t = Date.UTC(+b.d.slice(0, 4), +b.d.slice(5, 7) - 1, +b.d.slice(8, 10));
+      var k = t - ((new Date(t).getUTCDay() + 6) % 7) * 864e5;
+      if (k !== key) { cur = { d: b.d, o: b.o, h: b.h, l: b.l, c: b.c, v: 0 }; out.push(cur); key = k; }
+      cur.h = Math.max(cur.h, b.h);
+      cur.l = Math.min(cur.l, b.l);
+      cur.c = b.c;
+      cur.v += b.v;
+      cur.d = b.d;
+    });
     return out;
   }
 
@@ -195,7 +216,23 @@
   }
 
   function unit() { return state.period === 'day' ? '天' : '週'; }
-  function ago(i, end) { var k = end - 1 - i; return k === 0 ? '最新' : k + ' ' + unit() + '前'; }
+  var WEEKDAY = '日一二三四五六';
+  function dayName(d) { return WEEKDAY[new Date(Date.UTC(+d.slice(0, 4), +d.slice(5, 7) - 1, +d.slice(8, 10))).getUTCDay()]; }
+  // 選到的那一根怎麼稱呼：示意資料用「幾天前」，真實資料用日期
+  function ago(i, end) {
+    var b = data[state.period].bars[i];
+    if (b && b.d) {
+      var d = b.d.replace(/-/g, '/');
+      return state.period === 'day' ? d + '（' + dayName(b.d) + '）' : '截至 ' + d + ' 的那一週';
+    }
+    var k = end - 1 - i;
+    return k === 0 ? '最新' : k + ' ' + unit() + '前';
+  }
+  function axisLabel(i, end) {
+    var b = data[state.period].bars[i];
+    if (!b || !b.d) return ago(i, end);
+    return state.period === 'day' ? +b.d.slice(5, 7) + '/' + +b.d.slice(8, 10) : b.d.slice(0, 4) + '/' + +b.d.slice(5, 7);
+  }
 
   function render() {
     var box = el('lab-chart');
@@ -309,12 +346,12 @@
       }
     }
 
-    // X 軸：用「幾天前」標示，避免看起來像真的日期
+    // X 軸：示意資料用「幾天前」標示，避免看起來像真的日期；真實資料標日期
     var gAx = node('g', {}, svg);
     var marks = [v.start, v.start + Math.round(n / 3), v.start + Math.round(2 * n / 3), v.end - 1];
     marks.forEach(function (i2, k) {
       var t = node('text', { x: X(i2), y: H - 4, class: 'lab-axis', 'text-anchor': k === 0 ? 'start' : k === 3 ? 'end' : 'middle' }, gAx);
-      t.textContent = ago(i2, v.end);
+      t.textContent = axisLabel(i2, v.end);
     });
 
     // 選取的那一根
@@ -513,7 +550,7 @@
     note.className = 'lab-read-note';
     note.textContent = '以上全部是用「過去的價格和成交量」算出來的，只能描述現在的狀態，不能保證下一根怎麼走。';
     box.appendChild(note);
-    el('lab-chart').setAttribute('aria-label', '示意 K 線圖。' + h.textContent + '。用左右方向鍵換一根，判讀寫在圖下方。');
+    el('lab-chart').setAttribute('aria-label', (external ? label + (state.period === 'day' ? ' 日' : ' 週') + ' K 線圖。' : '示意 K 線圖。') + h.textContent + '。用左右方向鍵換一根，判讀寫在圖下方。');
   }
 
   // ---------- 「找一天」按鈕 ----------
@@ -549,7 +586,7 @@
     var kind = btn.getAttribute('data-find'), f = FINDERS[kind];
     var i = find(kind);
     var msg = el('lab-find-msg');
-    if (i < 0) { msg.textContent = '這段走勢裡沒有找到，按「換一組走勢」再試試。'; return; }
+    if (i < 0) { msg.textContent = external ? '圖上這段時間裡沒有出現。' : '這段走勢裡沒有找到，按「換一組走勢」再試試。'; return; }
     if (f.sub) setRadio('lab-sub', f.sub);
     if (f.main) setRadio('lab-main', f.main);
     state.sel = i;
@@ -605,22 +642,30 @@
     render();
   }
 
+  // 美股日報換股票時呼叫：bars 是日 K（每根有 d 日期），name 是圖的名稱
+  function load(bars, name) {
+    data = { day: series(bars), week: series(weeklyByDate(bars)) };
+    label = name || '';
+    state.sel = data[state.period].bars.length - 1;
+    el('lab-find-msg').textContent = '';
+    render();
+  }
+  window.StockChart.load = load;
+
   function init() {
-    build();
-    state.sel = data.day.bars.length - 1;
     root.addEventListener('change', onControl);
     el('lab-find').addEventListener('click', onFind);
     el('lab-chart').addEventListener('keydown', onKey);
     el('lab-chart').addEventListener('pointerdown', onPointer);
     el('lab-chart').addEventListener('pointermove', onPointer);
-    el('lab-new').addEventListener('click', regenerate);
+    if (el('lab-new')) el('lab-new').addEventListener('click', regenerate);
     var timer;
-    window.addEventListener('resize', function () { clearTimeout(timer); timer = setTimeout(render, 120); });
+    window.addEventListener('resize', function () { clearTimeout(timer); timer = setTimeout(function () { if (data) render(); }, 120); });
+    if (external) return;
+    build();
+    state.sel = data.day.bars.length - 1;
     render();
   }
-
-  // 給測試用
-  window.StockChart = { sma: sma, ema: ema, boll: boll, macd: macd, kd: kd, rsi: rsi, toWeekly: toWeekly, makeDaily: makeDaily };
 
   init();
 })();
