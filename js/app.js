@@ -1,4 +1,4 @@
-/* 台股入門 30 天 — 首頁、目錄、課文三個頁面共用的程式 */
+/* 台股入門 60 天 — 首頁、目錄、課文三個頁面共用的程式 */
 (function () {
   'use strict';
 
@@ -11,6 +11,7 @@
   var LESSONS = (window.LESSONS || []).slice().sort(function (a, b) { return a.day - b.day; });
   var WEEKS = window.WEEKS || {};
   var TOTAL = LESSONS.length;
+  var BRAND = '台股入門 ' + TOTAL + ' 天';
 
   // ---------- 日期 ----------
 
@@ -38,7 +39,7 @@
 
   function pad(n) { return (n < 10 ? '0' : '') + n; }
 
-  // 今天是第幾天（可能小於 1 或大於 30）
+  // 今天是第幾天（可能小於 1 或大於 TOTAL）
   function courseDay() {
     return Math.floor((ymdToUTC(todayYMD()) - ymdToUTC(START)) / DAY_MS) + 1;
   }
@@ -107,6 +108,9 @@
 
   function lessonURL(day) { return 'lesson.html?day=' + day; }
 
+  // draft：課文還在查證資料，只有標題和目標
+  function isDraft(L) { return !!(L && L.draft); }
+
   function el(id) { return document.getElementById(id); }
 
   function storageNotice() {
@@ -122,7 +126,7 @@
     var read = loadRead();
     var phase = today < 1 ? 'before' : today > TOTAL ? 'after' : 'during';
     var firstUnread = 0;
-    for (var i = 1; i <= TOTAL; i++) if (read.indexOf(i) === -1) { firstUnread = i; break; }
+    for (var i = 1; i <= TOTAL; i++) if (read.indexOf(i) === -1 && !isDraft(byDay(i))) { firstUnread = i; break; }
 
     var featured = phase === 'before' ? 1 : phase === 'during' ? today : (firstUnread || TOTAL);
     var L = byDay(featured);
@@ -136,9 +140,13 @@
       band = '<span>今天 ' + dateLabel(today) + '</span><span>第 ' + L.week + ' 週</span>';
       button = '讀今天的課';
     } else {
-      band = '<span>30 天課程走完了</span><span>' + read.length + ' / ' + TOTAL + ' 已讀</span>';
+      band = '<span>' + TOTAL + ' 天課程走完了</span><span>' + read.length + ' / ' + TOTAL + ' 已讀</span>';
       button = firstUnread ? '補讀第 ' + featured + ' 課' : '再讀一次最後一課';
-      note = firstUnread ? '還有沒讀的課，從最前面那一課開始補。' : '30 課全部讀完了。之後想複習，可以從每週的實戰日開始。';
+      note = firstUnread ? '還有沒讀的課，從最前面那一課開始補。' : TOTAL + ' 課全部讀完了。之後想複習，可以從每週的實戰日開始。';
+    }
+    if (isDraft(L)) {
+      button = '看這一課的預告';
+      note = '這一課的課文還在查證資料，寫好就會出現在這裡。先複習前面的實戰日也很好。';
     }
 
     var html = '';
@@ -157,7 +165,7 @@
     // 中間有漏讀的課，提醒一下
     if (phase === 'during' && firstUnread && firstUnread < today) {
       var missed = 0;
-      for (var j = 1; j < today; j++) if (read.indexOf(j) === -1) missed++;
+      for (var j = 1; j < today; j++) if (read.indexOf(j) === -1 && !isDraft(byDay(j))) missed++;
       html += '<div class="catchup"><p>前面還有 ' + missed + ' 課沒標記已讀，最早的是 <a href="' + lessonURL(firstUnread) + '">第 ' + firstUnread + ' 天：' + esc(byDay(firstUnread).title) + '</a>。</p></div>';
     }
 
@@ -175,20 +183,21 @@
     html += '<ul class="howto">';
     html += '<li>每天一課：先讀觀念和真實案例，再照「今日實戰」實際操作一次。</li>';
     html += '<li>第 1 天就開戶，第 7 天下第一筆小額零股；每週最後一天是實戰日。</li>';
+    html += '<li>看盤 App 上的 K 線、均線、MACD、KD、RSI 看不懂，到<a href="guide.html">看盤指南</a>的指標實驗室點點看。</li>';
     html += '<li>算成本、漲跌停價、該買多少，還有記錄每一筆交易，都在<a href="tools.html">實戰工具</a>。</li>';
     html += '<li>讀完按課文最下面的「標記為已讀」，格子就會變紅。在台股，紅色代表上漲。</li>';
     html += '<li>進度只存在你這台手機或平板的瀏覽器裡，換裝置不會跟著走。</li>';
     html += '</ul>';
-    html += '<p><a href="lessons.html">看全部 30 課的目錄</a></p>';
+    html += '<p><a href="lessons.html">看全部 ' + TOTAL + ' 課的目錄</a></p>';
     html += '</section>';
 
     main.innerHTML = html;
   }
 
-  // 30 格，一列 7 天（第 1 天剛好是星期一）
+  // 一列 7 天（第 1 天剛好是星期一）
   function monthGrid(read, today) {
     var head = ['一', '二', '三', '四', '五', '六', '日'];
-    var html = '<div class="month" role="list" aria-label="30 天進度">';
+    var html = '<div class="month" role="list" aria-label="' + TOTAL + ' 天進度">';
     head.forEach(function (h) { html += '<div class="month-head" aria-hidden="true">' + h + '</div>'; });
     LESSONS.forEach(function (L) {
       var cls = [];
@@ -196,7 +205,8 @@
       if (done) cls.push('is-read');
       if (L.day === today) cls.push('is-today');
       if (L.review) cls.push('is-review');
-      var label = '第 ' + L.day + ' 天：' + L.title + (done ? '（已讀）' : '') + (L.day === today ? '（今天）' : '');
+      if (isDraft(L)) cls.push('is-draft');
+      var label = '第 ' + L.day + ' 天：' + L.title + (done ? '（已讀）' : '') + (L.day === today ? '（今天）' : '') + (isDraft(L) ? '（準備中）' : '');
       html += '<div role="listitem"><a class="' + cls.join(' ') + '" href="' + lessonURL(L.day) + '" aria-label="' + esc(label) + '">' + (L.review ? '實戰' : L.day) + '</a></div>';
     });
     html += '</div>';
@@ -210,7 +220,9 @@
     var today = courseDay();
     var read = loadRead();
     var html = '<h1 class="page-title">全部課程</h1>';
-    html += '<p class="page-lead">30 天、30 課，每課都有一個用真實市場做的實戰練習。已讀 ' + read.length + ' / ' + TOTAL + '。</p>';
+    var drafts = LESSONS.filter(isDraft).length;
+    html += '<p class="page-lead">' + TOTAL + ' 天、' + TOTAL + ' 課，每課都有一個用真實市場做的實戰練習。已讀 ' + read.length + ' / ' + TOTAL + '。' +
+      (drafts ? '標「準備中」的 ' + drafts + ' 課還在查證資料，先看標題和目標。' : '') + '</p>';
     html += storageNotice();
 
     var weeks = {};
@@ -226,7 +238,8 @@
         var done = read.indexOf(L.day) !== -1;
         var isToday = L.day === today;
         var right = done ? '<span class="seal" aria-label="已讀">已讀</span>' :
-          isToday ? '<span class="tag tag-today">今天</span>' : '<span></span>';
+          isToday ? '<span class="tag tag-today">今天</span>' :
+          isDraft(L) ? '<span class="tag tag-draft">準備中</span>' : '<span></span>';
         html += '<li' + (isToday ? ' class="toc-today"' : '') + '><a href="' + lessonURL(L.day) + '">' +
           '<span class="toc-day">' + L.day + '</span>' +
           '<span><span class="toc-title">' + esc(L.title) + '</span><span class="toc-date">' + dateLabel(L.day) + '</span></span>' +
@@ -257,11 +270,11 @@
       main.innerHTML = '<h1 class="page-title">找不到這一課</h1>' +
         '<p>網址裡的課號不對。課程從第 1 天到第 ' + TOTAL + ' 天。</p>' +
         '<p><a class="btn" href="lessons.html">回到全部課程</a></p>';
-      document.title = '找不到這一課｜台股入門 30 天';
+      document.title = '找不到這一課｜' + BRAND;
       return;
     }
 
-    document.title = '第 ' + L.day + ' 天　' + L.title + '｜台股入門 30 天';
+    document.title = '第 ' + L.day + ' 天　' + L.title + '｜' + BRAND;
     var today = courseDay();
     var done = isRead(L.day);
 
@@ -274,6 +287,20 @@
     html += '</header>';
 
     html += '<div class="goal"><span class="goal-label">今天學什麼</span><p>' + esc(L.goal) + '</p></div>';
+
+    var prev = byDay(L.day - 1);
+    var next = byDay(L.day + 1);
+
+    if (isDraft(L)) {
+      html += '<div class="notice draft-notice"><p><b>這一課正在準備中。</b>課文裡的每個數字都要先查到來源和日期，寫好就會出現在這裡。</p>' +
+        '<p>先做這件事：回到這一週之前的實戰日，把還沒完成的練習補完。</p></div>';
+      html += '<p class="disclaimer">' + DISCLAIMER + '</p>';
+      html += pager(prev, next);
+      html += '</article>';
+      main.innerHTML = html;
+      arrowKeys(prev, next);
+      return;
+    }
 
     html += '<h2>白話解釋</h2>' + L.explain;
 
@@ -305,14 +332,7 @@
     html += '<p class="read-hint" id="read-hint">' + (storageOK ? '紀錄只存在這台裝置的瀏覽器。' : '這個瀏覽器無法記錄已讀（可能開了無痕模式）。') + '</p>';
     html += '</div>';
 
-    var prev = byDay(L.day - 1);
-    var next = byDay(L.day + 1);
-    html += '<nav class="pager" aria-label="上一課和下一課">';
-    html += prev ? '<a class="prev" href="' + lessonURL(prev.day) + '" rel="prev"><small>上一課</small>第 ' + prev.day + ' 天　' + esc(prev.title) + '</a>' :
-      '<span class="prev"><small>上一課</small>這是第一課</span>';
-    html += next ? '<a class="next" href="' + lessonURL(next.day) + '" rel="next"><small>下一課</small>第 ' + next.day + ' 天　' + esc(next.title) + '</a>' :
-      '<span class="next"><small>下一課</small>這是最後一課</span>';
-    html += '</nav>';
+    html += pager(prev, next);
     html += '</article>';
 
     main.innerHTML = html;
@@ -333,7 +353,20 @@
       seal.classList.toggle('is-on', now);
     });
 
-    // 外接鍵盤的 iPad：左右方向鍵換課
+    arrowKeys(prev, next);
+  }
+
+  function pager(prev, next) {
+    var html = '<nav class="pager" aria-label="上一課和下一課">';
+    html += prev ? '<a class="prev" href="' + lessonURL(prev.day) + '" rel="prev"><small>上一課</small>第 ' + prev.day + ' 天　' + esc(prev.title) + '</a>' :
+      '<span class="prev"><small>上一課</small>這是第一課</span>';
+    html += next ? '<a class="next" href="' + lessonURL(next.day) + '" rel="next"><small>下一課</small>第 ' + next.day + ' 天　' + esc(next.title) + '</a>' :
+      '<span class="next"><small>下一課</small>這是最後一課</span>';
+    return html + '</nav>';
+  }
+
+  // 外接鍵盤的 iPad：左右方向鍵換課
+  function arrowKeys(prev, next) {
     document.addEventListener('keydown', function (e) {
       if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
       var t = e.target && e.target.tagName;
