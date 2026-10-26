@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>看盤指南｜台股入門 60 天</title>
+<meta name="description" content="看懂看盤 App 上的每一格：K 線週期、均線、成交量、MACD、KD、RSI、布林通道、美股盤前盤後夜盤、分析師目標價。">
+<meta name="theme-color" content="#c42b2f">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@400;700&display=swap">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body data-page="guide">
+<a class="skip-link" href="#main">跳到主要內容</a>
+<header class="site-header">
+  <a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true"></span>台股入門 60 天</a>
+  <nav class="site-nav" aria-label="主選單">
+    <a href="index.html">今天</a>
+    <a href="lessons.html">課程</a>
+    <a href="guide.html" aria-current="page">看盤</a>
+    <a href="tools.html">工具</a>
+  </nav>
+</header>
+<main id="main">
+  <h1 class="page-title">看盤指南</h1>
+  <p class="page-lead">把看盤 App 上的每一格講清楚。先在「指標實驗室」自己點點看，再往下看每個指標的白話說明。</p>
+  <nav class="tool-nav" aria-label="看盤指南">
+    <a href="#lab">指標實驗室</a>
+    <a href="#quote">報價畫面</a>
+    <a href="#chart">K 線和均線</a>
+    <a href="#indicators">四個指標</a>
+    <a href="#us">美股時段</a>
+    <a href="#ratings">評級和目標價</a>
+    <a href="#apps">App 怎麼選</a>
+  </nav>
+
+  <section class="tool lab" id="lab" aria-labelledby="lab-title">
+    <h2 id="lab-title">指標實驗室</h2>
+    <p class="tool-desc">下面是電腦產生的<b>示意走勢</b>，不是任何一檔真的股票。點一下圖（或按左右方向鍵）選一根 K 線，圖下方會用白話說明每個指標在講什麼。</p>
+    <form class="lab-controls" onsubmit="return false">
+      <fieldset class="seg"><legend>週期</legend>
+        <label><input type="radio" name="lab-period" value="day" checked> 日 K</label>
+        <label><input type="radio" name="lab-period" value="week"> 週 K</label>
+      </fieldset>
+      <fieldset class="seg"><legend>主圖</legend>
+        <label><input type="radio" name="lab-main" value="ma" checked> 均線</label>
+        <label><input type="radio" name="lab-main" value="boll"> 布林通道</label>
+      </fieldset>
+      <fieldset class="seg"><legend>副圖</legend>
+        <label><input type="radio" name="lab-sub" value="vol" checked> 成交量</label>
+        <label><input type="radio" name="lab-sub" value="macd"> MACD</label>
+        <label><input type="radio" name="lab-sub" value="kd"> KD</label>
+        <label><input type="radio" name="lab-sub" value="rsi"> RSI</label>
+      </fieldset>
+      <fieldset class="seg"><legend>顏色</legend>
+        <label><input type="radio" name="lab-color" value="tw" checked> 紅漲綠跌</label>
+        <label><input type="radio" name="lab-color" value="us"> 綠漲紅跌</label>
+      </fieldset>
+    </form>
+    <div class="lab-panel">
+      <div class="lab-legend" id="lab-legend-main"></div>
+      <div class="lab-chart" id="lab-chart" tabindex="0" role="img" aria-label="示意 K 線圖"></div>
+      <div class="lab-legend" id="lab-legend-sub"></div>
+    </div>
+    <div class="lab-find" id="lab-find">
+      <p class="lab-find-label">幫我找一根：</p>
+      <button type="button" class="btn-small" data-find="hot">RSI 最熱</button>
+      <button type="button" class="btn-small" data-find="cold">RSI 最冷</button>
+      <button type="button" class="btn-small" data-find="gold">MACD 黃金交叉</button>
+      <button type="button" class="btn-small" data-find="death">KD 死亡交叉</button>
+      <button type="button" class="btn-small" data-find="volume">爆量</button>
+      <button type="button" class="btn-small" data-find="breakdown">跌破 MA20</button>
+    </div>
+    <p class="tool-msg" id="lab-find-msg" aria-live="polite"></p>
+    <div class="lab-read" id="lab-read"></div>
+    <p class="lab-actions"><button type="button" class="btn btn-quiet" id="lab-new">換一組走勢</button></p>
+  </section>
+
+  <section class="tool" id="quote" aria-labelledby="quote-title">
+    <h2 id="quote-title">報價畫面：每一格在講什麼</h2>
+    <div class="table-wrap"><table class="guide-table">
+      <thead><tr><th>欄位</th><th>白話</th></tr></thead>
+      <tbody>
+        <tr><td>今開（開市）</td><td>今天第一筆成交價</td></tr>
+        <tr><td>最高／最低</td><td>今天成交過的最高、最低價</td></tr>
+        <tr><td>昨收（前收）</td><td>前一個交易日的收盤價。報價的漲跌都是跟它比</td></tr>
+        <tr><td>成交量</td><td>今天成交多少股（台股常用「張」，1 張＝1,000 股）</td></tr>
+        <tr><td>成交額</td><td>今天成交的總金額，台股叫成交值</td></tr>
+        <tr><td>市值</td><td>股價 × 全部股數</td></tr>
+        <tr><td>市盈率 TTM</td><td>本益比，用最近四季的獲利算。台股叫本益比</td></tr>
+        <tr><td>市盈率（靜）</td><td>用上一個完整年度的獲利算的本益比</td></tr>
+        <tr><td>市盈率（動）</td><td>用預估的未來獲利算的本益比</td></tr>
+      </tbody>
+    </table></div>
+    <p>富途的報價顏色是跟昨收比，K 線顏色是跟當天開盤比，所以偶爾會看到「報價是跌的，K 線卻是漲的」。自己算一次本益比和市值，見<a href="lesson.html?day=31">第 31 課</a>。</p>
+    <div class="sources"><p class="sources-title">資料來源</p><ul>
+      <li>moomoo 學習中心〈如何正確運用市盈率〉：市盈率分為靜態、TTM 和動態　<a href="https://www.moomoo.com/us/hans/learn/how-to-use-the-p-e-ratio-correctly" target="_blank" rel="noopener">開啟來源</a></li>
+      <li>富途牛牛幫助中心：報價的漲跌顏色跟昨收比，K 線的顏色跟當天開盤比　<a href="https://support.futunn.com/topic40" target="_blank" rel="noopener">開啟來源</a></li>
+      <li>臺灣證券交易所：本益比用最近四季每股稅後純益計算　<a href="https://www.twse.com.tw/zh/trading/historical/bwibbu-day.html" target="_blank" rel="noopener">開啟來源</a></li>
+    </ul></div>
+  </section>
+
+  <section class="tool" id="chart" aria-labelledby="chart-title">
+    <h2 id="chart-title">K 線、週期和均線</h2>
+    <ul>
+      <li><b>一根 K 線多長，看週期</b>：日 K 一根一天，週 K 一根一週，月 K 一根一個月。長期投資看週 K、月 K。</li>
+      <li><b>MA 後面的數字是「幾期」</b>：日 K 上的 MA5 是 5 天平均；切到週 K，MA5 就是 5 週平均。</li>
+      <li><b>台股常用三條</b>：MA5 週線、MA20 月線、MA60 季線。股價在均線上，代表那段時間買的人平均是賺的。</li>
+      <li><b>顏色</b>：台股紅漲綠跌；美國習慣綠漲紅跌。富途可以在「設定 &gt; 報價設定 &gt; 升跌顏色」改。</li>
+    </ul>
+    <p>詳細說明：<a href="lesson.html?day=15">第 15 課 K 線和週期</a>、<a href="lesson.html?day=16">第 16 課 均線</a>、<a href="lesson.html?day=17">第 17 課 成交量和法人</a>。</p>
+    <div class="sources"><p class="sources-title">資料來源</p><ul>
+      <li>富途牛牛幫助中心：MA5、MA10、MA20、MA60 分別是 5、10、20、60 日的移動平均線　<a href="https://support.futunn.com/topic252" target="_blank" rel="noopener">開啟來源</a></li>
+      <li>富途牛牛幫助中心：報價圖表如何設定綠漲紅跌　<a href="https://support.futunn.com/hant/topic76" target="_blank" rel="noopener">開啟來源</a></li>
+    </ul></div>
+  </section>
+
+  <section class="tool" id="indicators" aria-labelledby="ind-title">
+    <h2 id="ind-title">四個常見指標，一次看懂</h2>
+    <div class="ind-grid">
+      <div class="ind-card">
+        <h3>MACD</h3>
+        <dl>
+          <dt>常見設定</dt><dd>12、26、9</dd>
+          <dt>在看什麼</dt><dd>趨勢的力道：快線 DIF 和慢線（DEA）的距離</dd>
+          <dt>常說的訊號</dt><dd>DIF 往上穿過慢線叫黃金交叉，往下穿叫死亡交叉</dd>
+          <dt>容易被騙</dt><dd>盤整時線會一直交叉，訊號很多但都不準</dd>
+        </dl>
+      </div>
+      <div class="ind-card">
+        <h3>KD</h3>
+        <dl>
+          <dt>常見設定</dt><dd>9、3、3</dd>
+          <dt>在看什麼</dt><dd>收盤落在最近 9 天高低區間的哪裡</dd>
+          <dt>常說的訊號</dt><dd>80 以上偏熱、20 以下偏冷；K 穿過 D 叫交叉</dd>
+          <dt>容易被騙</dt><dd>強勢股會一直停在 80 以上（鈍化）</dd>
+        </dl>
+      </div>
+      <div class="ind-card">
+        <h3>RSI</h3>
+        <dl>
+          <dt>常見設定</dt><dd>14 日；富途是 6、12、24 日</dd>
+          <dt>在看什麼</dt><dd>一段時間內，漲的幅度占漲跌總幅度的比例</dd>
+          <dt>常說的訊號</dt><dd>14 日常用 70／30；富途說明用 80／20</dd>
+          <dt>容易被騙</dt><dd>急漲急跌時，可以在超買或超賣區停很久</dd>
+        </dl>
+      </div>
+      <div class="ind-card">
+        <h3>布林通道</h3>
+        <dl>
+          <dt>常見設定</dt><dd>20 日、±2 個標準差</dd>
+          <dt>在看什麼</dt><dd>波動大小：價格離平均多遠</dd>
+          <dt>常說的訊號</dt><dd>碰上軌是漲得急、碰下軌是跌得急；通道變窄是在等方向</dd>
+          <dt>容易被騙</dt><dd>強勢時價格會沿著上軌一直走</dd>
+        </dl>
+      </div>
+    </div>
+    <p>這四個都是用過去的價格算出來的體溫計：說明現在熱不熱，不預言下一根。名稱也可能不同：慢線有的 App 叫 DEA，有的叫 MACD 或訊號線，先看是哪兩條線再判斷。完整說明和案例見<a href="lesson.html?day=18">第 18 課</a>。</p>
+    <div class="sources"><p class="sources-title">資料來源</p><ul>
+      <li>口袋學堂：KD 指標參數一般設為 (9,3,3)；80 以上超買、20 以下超賣　<a href="https://www.pocket.tw/school/articles/4233/" target="_blank" rel="noopener">開啟來源</a></li>
+      <li>口袋學堂：RSI 市場預設 14 天，70 以上超買、30 以下超賣；鈍化時交叉訊號可能失效　<a href="https://www.pocket.tw/school/articles/5267/" target="_blank" rel="noopener">開啟來源</a></li>
+      <li>富途牛牛幫助中心：RSI 三條線為 6、12、24 日；80 以上超買、20 以下超賣　<a href="https://support.futunn.com/topic251" target="_blank" rel="noopener">開啟來源</a></li>
+      <li>富途牛牛幫助中心：MACD 的 DIF＝12 日 EMA 減 26 日 EMA　<a href="https://support.futunn.com/hant/topic165" target="_blank" rel="noopener">開啟來源</a></li>
+      <li>John Bollinger 官網：布林通道預設 20 期均線、±2 個標準差　<a href="https://www.bollingerbands.com/bollinger-bands" target="_blank" rel="noopener">開啟來源</a></li>
+    </ul></div>
+  </section>
+
+  <section class="tool" id="us" aria-labelledby="us-title">
+    <h2 id="us-title">美股時段：盤前、盤中、盤後、夜盤</h2>
+    <p>美股正常交易是美東時間 9:30～16:00。美國 2026 年 11 月 1 日結束夏令時間，台灣時間會晚一小時：</p>
+    <div class="table-wrap"><table class="guide-table">
+      <thead><tr><th>時段（台灣時間）</th><th>夏令（到 10/31）</th><th>冬令（2026/11/1 起）</th></tr></thead>
+      <tbody>
+        <tr><td>盤前</td><td>16:00～21:30</td><td>17:00～22:30</td></tr>
+        <tr><td>正常交易</td><td>21:30～隔天 04:00</td><td>22:30～隔天 05:00</td></tr>
+        <tr><td>盤後</td><td>04:00～08:00</td><td>05:00～09:00</td></tr>
+        <tr><td>富途夜盤</td><td>08:00～16:00</td><td>09:00～17:00</td></tr>
+      </tbody>
+    </table></div>
+    <p>盤前、盤後各券商開放的時間可能更短。富途的夜盤是美東時間週日到週四 20:00～隔天 04:00，只有部分股票，只能用限價單。這些時段人少、價格跳得大，新手只當參考；要下單，在正常交易時間用限價。詳見<a href="lesson.html?day=20">第 20 課</a>。</p>
+    <div class="sources"><p class="sources-title">資料來源</p><ul>
+      <li>Nasdaq：美股正常交易時間為美東時間 9:30～16:00　<a href="https://www.nasdaq.com/market-activity/stock-market-holiday-schedule" target="_blank" rel="noopener">開啟來源</a></li>
+      <li>Fidelity：盤前 4:00～9:30、盤後 16:00～20:00（美東時間），各券商可能更短　<a href="https://www.fidelity.com/learning-center/smart-money/stock-market-hours" target="_blank" rel="noopener">開啟來源</a></li>
+      <li>timeanddate.com：紐約 2026 年 11 月 1 日凌晨 2 點結束夏令時間　<a href="https://www.timeanddate.com/time/change/@z-us-10065?year=2026" target="_blank" rel="noopener">開啟來源</a></li>
+      <li>富途證券（香港）幫助中心：美股夜盤為週日到週四 20:00～次日 04:00（美東時間）　<a href="https://www.futuhk.com/hans/support/topic2_707" target="_blank" rel="noopener">開啟來源</a></li>
+    </ul></div>
+  </section>
+
+  <section class="tool" id="ratings" aria-labelledby="ratings-title">
+    <h2 id="ratings-title">分析師評級、目標價和晨星</h2>
+    <ul>
+      <li><b>評級</b>：買進、持有、賣出。富途會統計有幾家給買進、幾家給持有。</li>
+      <li><b>目標價</b>：分析師估計未來大約一年的合理價格。看最高、平均、最低差多少：差越多，代表看法越分歧。</li>
+      <li><b>晨星公允價值和星等</b>：星等拿股價跟公允價值比，4～5 星是股價明顯低於公允價值，1～2 星是明顯高於，每天收盤後重算。</li>
+      <li><b>晨星護城河</b>：寬、窄、無，看公司能不能長期賺得比別人多。</li>
+    </ul>
+    <p>例子：台積電 2026/10/15 法說會後，10/16 收 2,420 元，當天整理的內外資目標價從 3,090 元到 5,000 元都有。目標價是一種看法，不是買進的理由。詳見<a href="lesson.html?day=19">第 19 課</a>和<a href="lesson.html?day=32">第 32 課</a>。</p>
+    <div class="sources"><p class="sources-title">資料來源</p><ul>
+      <li>經濟日報：台積電法說後 10/16 收 2,420 元；內外資目標價從法巴 3,090 元到 Aletheia 5,000 元（資料日期：2026-10-16）　<a href="https://udn.com/news/story/7252/9819470" target="_blank" rel="noopener">開啟來源</a></li>
+      <li>Morningstar：星等拿股價跟公允價值比，每天收盤後重算　<a href="https://www.morningstar.com/stocks/how-determine-whether-stock-is-cheap-expensive-or-fairly-valued" target="_blank" rel="noopener">開啟來源</a></li>
+      <li>Morningstar 股票研究方法：寬護城河、窄護城河的定義　<a href="https://www.morningstar.com/content/dam/marketing/shared/research/methodology/705988Morningstar_Equity_Research_Methodology.pdf" target="_blank" rel="noopener">開啟來源</a></li>
+    </ul></div>
+  </section>
+
+  <section class="tool" id="apps" aria-labelledby="apps-title">
+    <h2 id="apps-title">看盤 App 怎麼選</h2>
+    <p>長期投資不需要很多 App。照用途分三類就好：</p>
+    <div class="table-wrap"><table class="guide-table">
+      <thead><tr><th>用途</th><th>可以用</th><th>說明</th></tr></thead>
+      <tbody>
+        <tr><td>下單</td><td>你的券商 App</td><td>台股用開戶的那家券商；美股用複委託或你選的海外券商（見<a href="lesson.html?day=33">第 33 課</a>）</td></tr>
+        <tr><td>看圖</td><td>富途牛牛、TradingView</td><td>富途的 K 線、指標、分析師評級和晨星研報整理得很完整。TradingView 台股、美股都能看，免費版每張圖最多 2 個指標</td></tr>
+        <tr><td>查台股資料</td><td>公開資訊觀測站、證交所、Goodinfo!</td><td>公開資訊觀測站看公司公告和財報；證交所看大盤和三大法人；Goodinfo! 有股利、本益比河流圖等整理好的頁面</td></tr>
+      </tbody>
+    </table></div>
+    <p>證交所網站的免費行情約 5 秒更新一次；「延遲行情」一般是指晚 20 分鐘以上。看盤用哪個 App 都可以，但下單的帳戶要選出事時找得到人的。</p>
+    <div class="sources"><p class="sources-title">資料來源</p><ul>
+      <li>TradingView 方案比較：Basic（免費）每張圖 2 個指標　<a href="https://www.tradingview.com/pricing/" target="_blank" rel="noopener">開啟來源</a></li>
+      <li>TradingView：台積電 TWSE:2330 頁面（支援台股）　<a href="https://www.tradingview.com/symbols/TWSE-2330/" target="_blank" rel="noopener">開啟來源</a></li>
+      <li>臺灣證券交易所 FAQ：免費基本市況報導約每 5 秒更新；延遲行情指 20 分鐘以上　<a href="https://www.twse.com.tw/pcversion/en/page/products/info-vendor/faq.html" target="_blank" rel="noopener">開啟來源</a></li>
+      <li>Goodinfo! 台灣股市資訊網：股利政策頁　<a href="https://goodinfo.tw/tw/StockDividendPolicy.asp" target="_blank" rel="noopener">開啟來源</a></li>
+    </ul></div>
+  </section>
+</main>
+<footer class="site-footer">
+  <p>本站所有內容為教育用途，不構成買賣建議。投資有賺有賠，請自己判斷。</p>
+  <p>案例數字都標了資料日期和來源；股價每天在變，請以最新公告為準。</p>
+</footer>
+<script src="js/chart.js"></script>
+</body>
+</html>
