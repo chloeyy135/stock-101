@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>美股日報｜台股入門 60 天</title>
+<meta name="description" content="每天早上更新：用真的 K 線解釋 TSLA、GOOG、NVDA、AAPL、標普 500、COST 現在的趨勢，教你用基準率、情境和失效點練習預測，再加上台股觀察名單。">
+<meta name="theme-color" content="#c42b2f">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@400;700&display=swap">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body data-page="trend">
+<a class="skip-link" href="#main">跳到主要內容</a>
+<header class="site-header">
+  <a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true"></span>台股入門 60 天</a>
+  <nav class="site-nav" aria-label="主選單">
+    <a href="index.html">今天</a>
+    <a href="lessons.html">課程</a>
+    <a href="trend.html" aria-current="page">日報</a>
+    <a href="guide.html">看盤</a>
+    <a href="tools.html">工具</a>
+  </nav>
+</header>
+<main id="main">
+  <h1 class="page-title">美股趨勢日報</h1>
+  <p class="page-lead">每個美股交易日的隔天早上更新。用真的 K 線看懂 6 檔美股現在是什麼趨勢，再一起練習預測接下來 5 個交易日；最後是台股觀察名單。</p>
+  <p class="tool-error" id="tr-error" hidden></p>
+  <nav class="tool-nav" aria-label="美股日報">
+    <a href="#today">今天的日報</a>
+    <a href="#board">六檔總覽</a>
+    <a href="#lab">看圖和體檢表</a>
+    <a href="#predict">怎麼預測</a>
+    <a href="#journal">預測日記</a>
+    <a href="#tw">台股觀察名單</a>
+    <a href="#archive">過去的日報</a>
+  </nav>
+
+  <section class="tool" id="today" aria-labelledby="today-title">
+    <h2 id="today-title">今天的日報</h2>
+    <div id="tr-today"><p class="tool-hint">載入中…</p></div>
+  </section>
+
+  <section class="tool" id="board" aria-labelledby="board-title">
+    <h2 id="board-title">六檔總覽</h2>
+    <p class="tool-desc">趨勢是電腦用固定規則判的（規則寫在下面的體檢表）。點一張卡片，就會在下面的圖打開那一檔。<span id="tr-asof"></span></p>
+    <div class="tr-board" id="tr-board"></div>
+  </section>
+
+  <section class="tool lab" id="lab" data-external aria-labelledby="lab-title">
+    <h2 id="lab-title">看圖和體檢表</h2>
+    <p class="tool-desc">這裡是<b>真的日 K</b>。點一下圖（或按左右方向鍵）選一根 K 線，下方會用白話說明那一天的指標；圖下面可以切換週 K、布林通道、MACD、KD、RSI。再往下是 Claude 的解讀和電腦自動算的體檢表。</p>
+    <form class="tr-pick" onsubmit="return false">
+      <fieldset class="seg tr-syms" id="tr-syms"></fieldset>
+    </form>
+    <p class="tr-lab-name" id="tr-lab-name"></p>
+    <div class="lab-panel">
+      <div class="lab-legend" id="lab-legend-main"></div>
+      <div class="lab-chart" id="lab-chart" tabindex="0" role="img" aria-label="K 線圖"></div>
+      <div class="lab-legend" id="lab-legend-sub"></div>
+    </div>
+    <form class="lab-controls tr-controls" onsubmit="return false">
+      <fieldset class="seg"><legend>週期</legend>
+        <label><input type="radio" name="lab-period" value="day" checked> 日 K</label>
+        <label><input type="radio" name="lab-period" value="week"> 週 K</label>
+      </fieldset>
+      <fieldset class="seg"><legend>主圖</legend>
+        <label><input type="radio" name="lab-main" value="ma" checked> 均線</label>
+        <label><input type="radio" name="lab-main" value="boll"> 布林通道</label>
+      </fieldset>
+      <fieldset class="seg"><legend>副圖</legend>
+        <label><input type="radio" name="lab-sub" value="vol" checked> 成交量</label>
+        <label><input type="radio" name="lab-sub" value="macd"> MACD</label>
+        <label><input type="radio" name="lab-sub" value="kd"> KD</label>
+        <label><input type="radio" name="lab-sub" value="rsi"> RSI</label>
+      </fieldset>
+      <fieldset class="seg"><legend>顏色</legend>
+        <label><input type="radio" name="lab-color" value="tw" checked> 紅漲綠跌</label>
+        <label><input type="radio" name="lab-color" value="us"> 綠漲紅跌</label>
+      </fieldset>
+    </form>
+    <div class="lab-find" id="lab-find">
+      <p class="lab-find-label">幫我找一根：</p>
+      <button type="button" class="btn-small" data-find="hot">RSI 最熱</button>
+      <button type="button" class="btn-small" data-find="cold">RSI 最冷</button>
+      <button type="button" class="btn-small" data-find="gold">MACD 黃金交叉</button>
+      <button type="button" class="btn-small" data-find="death">KD 死亡交叉</button>
+      <button type="button" class="btn-small" data-find="volume">爆量</button>
+      <button type="button" class="btn-small" data-find="breakdown">跌破 MA20</button>
+    </div>
+    <p class="tool-msg" id="lab-find-msg" aria-live="polite"></p>
+    <div class="lab-read" id="lab-read"></div>
+    <div class="tr-note" id="tr-note" hidden></div>
+    <div class="tr-health" id="tr-health"></div>
+  </section>
+
+  <section class="tool" id="predict" aria-labelledby="predict-title">
+    <h2 id="predict-title">怎麼預測走勢：先說實話，再教方法</h2>
+    <h3 class="tool-sub">先說實話</h3>
+    <ul>
+      <li><b>沒有人能準確預測明天、下週會漲還是跌。</b>短時間的漲跌，很大一部分是隨機的晃動。看下面預測日記裡的基準率表就知道：同一檔股票，5 天後是漲、跌還是盤整，常常接近三等分。</li>
+      <li><b>但「趨勢」有一點點延續性。</b>一篇研究 58 種期貨（股價指數、債券、外匯、原物料）的論文發現：過去 1～12 個月漲的，接下來比較容易再漲一陣子；拉到更長的時間，又會部分反轉。所以我們練的是「看懂現在的趨勢、估計它延續的機率」，不是猜明天的價錢。</li>
+      <li><b>指標規則常常「以前有效、後來失效」。</b>有研究用道瓊指數 1897～1986 年的資料，發現簡單的均線規則有效；但後來的研究把同一批規則拿到 1987～1996 年再測，效果就不顯著了。任何一個指標都不是水晶球。</li>
+    </ul>
+
+    <h3 class="tool-sub">預測的五個步驟</h3>
+    <ol class="tr-steps">
+      <li><b>先查基準率。</b>這檔股票平常 5 天、20 天後是漲、跌、盤整的比例各多少？這是你的起點。沒有好理由，就跟著基準率猜。</li>
+      <li><b>再定趨勢。</b>看 MA60（季線）的位置和方向：收盤和 MA20 都在 MA60 之上、MA60 往上，是上升趨勢；反過來是下降趨勢；其他都算盤整。順著趨勢，把機率往同一邊多調一點。</li>
+      <li><b>看力道和價位。</b>MACD 柱子變長還是變短、RSI 在 50 之上還是之下，告訴你趨勢在加速還是減速。再標出最近的高點（壓力）、低點（支撐）和均線：價格常在這些地方停下來；突破時成交量放大，比較可信。</li>
+      <li><b>查行事曆。</b>財報、Fed（美國聯準會）利率決議、CPI（消費者物價指數，看通膨）公布的那幾天，股價常常跳空，線圖訊號會被蓋過去。遇到這種日子，把握要打低。</li>
+      <li><b>寫成「情境＋機率＋失效點」，然後對答案。</b>例如：「5 天內盤整，把握 60%；如果收盤跌破 749，就承認看錯。」記在下面的預測日記，時間到了網頁會自動對答案。</li>
+    </ol>
+
+    <h3 class="tool-sub">把握 60% 是什麼意思</h3>
+    <p>代表你預期這種預測 10 次裡會錯 4 次，錯是正常的。重要的是長期下來，你說 60% 的那些預測，真的大約對 6 成；如果只對 3 成，就是太有自信。研究預測比賽的 Good Judgment Project 發現，先看基準率、看到新資訊就更新看法的人，預測比較準。</p>
+
+    <h3 class="tool-sub">長期投資的人怎麼用</h3>
+    <p>預測是用來練習「看懂市場」，不是用來決定要不要繼續定期定額。核心部位照計畫買（<a href="lesson.html?day=24">第 24 課</a>、<a href="lesson.html?day=25">第 25 課</a>）；趨勢判斷只拿來決定衛星部位的節奏，例如「下降趨勢時先別加碼、分批慢慢買」。</p>
+
+    <div class="sources"><p class="sources-title">資料來源</p><ul>
+      <li>Moskowitz、Ooi、Pedersen（2012）〈Time Series Momentum〉，Journal of Financial Economics 104 卷：58 種期貨，1～12 個月的報酬有延續性，更長期部分反轉　<a href="https://papers.ssrn.com/abstract=2089463" target="_blank" rel="noopener">開啟來源</a></li>
+      <li>Brock、Lakonishok、LeBaron（1992）〈Simple Technical Trading Rules and the Stochastic Properties of Stock Returns〉，Journal of Finance 47 卷：道瓊 1897～1986 年，均線和區間突破規則　<a href="https://ideas.repec.org/a/bla/jfinan/v47y1992i5p1731-64.html" target="_blank" rel="noopener">開啟來源</a></li>
+      <li>Sullivan、Timmermann、White（1999）〈Data-Snooping, Technical Trading Rule Performance, and the Bootstrap〉，Journal of Finance 54 卷：同一批規則在 1987～1996 年不再顯著　<a href="https://ideas.repec.org/p/fmg/fmgdps/dp303.html" target="_blank" rel="noopener">開啟來源</a></li>
+      <li>AI Impacts：Good Judgment Project 研究整理（基準率、訓練、持續更新）　<a href="https://aiimpacts.org/evidence-on-good-forecasting-practices-from-the-good-judgment-project/" target="_blank" rel="noopener">開啟來源</a></li>
+    </ul></div>
+  </section>
+
+  <section class="tool" id="journal" aria-labelledby="journal-title">
+    <h2 id="journal-title">預測日記</h2>
+    <p class="tool-desc">選一檔、猜方向、寫理由。網頁會記住你寫下時的最新收盤，時間到了自動對答案。5 個交易日漲跌超過 ±2%（20 個交易日超過 ±5%）才算漲或跌，其他算盤整。資料只存在這台裝置的瀏覽器裡。</p>
+    <form class="tool-form" id="fc-form">
+      <label class="field">股票
+        <select id="fc-sym"></select>
+      </label>
+      <label class="field">把握
+        <select id="fc-conf">
+          <option value="40">40%（三選一，比亂猜好一點）</option>
+          <option value="50">50%</option>
+          <option value="60" selected>60%</option>
+          <option value="70">70%</option>
+          <option value="80">80%</option>
+        </select>
+      </label>
+      <fieldset class="seg field-wide"><legend>方向</legend>
+        <label><input type="radio" name="fc-dir" value="up"> 漲</label>
+        <label><input type="radio" name="fc-dir" value="flat" checked> 盤整</label>
+        <label><input type="radio" name="fc-dir" value="down"> 跌</label>
+      </fieldset>
+      <fieldset class="seg field-wide"><legend>期間</legend>
+        <label><input type="radio" name="fc-h" value="5" checked> 5 個交易日</label>
+        <label><input type="radio" name="fc-h" value="20"> 20 個交易日</label>
+      </fieldset>
+      <label class="field field-wide">理由（看到什麼？）
+        <textarea id="fc-why" maxlength="300" placeholder="例如：站上 MA20、MACD 黃金交叉，但下週有財報"></textarea>
+      </label>
+      <label class="field field-wide">失效價（選填）<small>猜漲的話，跌破這個價就代表看錯；猜跌的話是漲破</small>
+        <input type="number" id="fc-stop" step="0.01" min="0" inputmode="decimal">
+      </label>
+      <p class="tool-actions field-wide"><button type="submit" class="btn">記下預測</button></p>
+    </form>
+    <p class="tool-msg" id="fc-msg" aria-live="polite"></p>
+    <p class="tr-score" id="fc-score"></p>
+    <div id="fc-list"></div>
+
+    <h3 class="tool-sub">基準率：如果每次都猜同一個方向</h3>
+    <div id="fc-base"></div>
+
+    <h3 class="tool-sub">Claude 的練習預測，也一起記分</h3>
+    <p class="tool-desc" id="cl-score"></p>
+    <div id="cl-list"></div>
+  </section>
+
+  <section class="tool" id="tw" aria-labelledby="tw-title">
+    <h2 id="tw-title">台股觀察名單：AI 供應鏈上的 5 家公司</h2>
+    <p>這是「值得研究、持續追蹤」的名單，不是買進建議。挑法：都是大型股（資訊多、成交量大），分別在 AI 資料中心供應鏈的不同位置，而且最近的營收都在成長。下面的數字都來自 2026 年 9 月以前公布的資料。</p>
+    <p class="notice"><b>先講缺點：</b>五家都押在同一個主題（AI 資料中心），常常一起漲、也一起跌。如果你已經買了 0050，裡面光台積電就占了大約六成。要買個股，先放在衛星部位、小金額、分批（<a href="lesson.html?day=25">第 25 課</a>）。</p>
+    <p class="tool-hint">名詞：<b>年增率</b>是跟去年同一個時期比；<b>每股盈餘（EPS）</b>是公司的獲利平均分到每一股是多少錢；<b>毛利率</b>是每賣 100 元，扣掉直接成本還剩幾元；<b>法說會</b>是公司向投資人說明財報的會議。</p>
+    <div class="ind-grid tw-grid">
+      <div class="ind-card">
+        <h3>台積電 <span class="ticker">2330</span></h3>
+        <dl>
+          <dt>在做什麼</dt><dd>晶圓代工：幫輝達、蘋果這些公司，把設計好的晶片做出來。</dd>
+          <dt>成長證據</dt><dd>2026 年第三季營收 1 兆 4,942 億元，年增 50.9%；每股盈餘 29.43 元，年增 68.7%。9 月營收 5,118.57 億元，年增 54.6%。</dd>
+          <dt>要小心</dt><dd>2 奈米新製程剛量產，一開始會拉低毛利率；新台幣升值會吃掉獲利；好消息很多已經反映在股價上。</dd>
+          <dt>怎麼追蹤</dt><dd>每月 10 日前後公布上個月營收；每季一次法說會。</dd>
+        </dl>
+      </div>
+      <div class="ind-card">
+        <h3>台達電 <span class="ticker">2308</span></h3>
+        <dl>
+          <dt>在做什麼</dt><dd>電源和散熱：做 AI 伺服器的電源、資料中心的供電設備和液冷散熱。</dd>
+          <dt>成長證據</dt><dd>2026 年 1～9 月營收 5,396.68 億元，年增 37.2%；第二季每股盈餘 9.68 元，創新高。</dd>
+          <dt>要小心</dt><dd>好公司的股價也會大跌：52 週最高 2,585 元，10/22 收 1,560 元，比高點少了約四成。電源晶片缺貨讓出貨延後；美國對它有一件 337 調查（公司說目前不影響產品）。</dd>
+          <dt>怎麼追蹤</dt><dd>月營收，和輝達新平台的出貨時間（台達電的出貨跟著它走）。</dd>
+        </dl>
+      </div>
+      <div class="ind-card">
+        <h3>日月光投控 <span class="ticker">3711</span></h3>
+        <dl>
+          <dt>在做什麼</dt><dd>封裝測試：晶片做好之後，把它包起來、測試能不能用。AI 晶片需要更先進的封裝。</dd>
+          <dt>成長證據</dt><dd>9 月營收 881.30 億元，年增 45.5%；1～9 月 6,088.87 億元，年增 30.2%。2026 年資本支出（蓋廠、買設備的錢）調高到約 105 億美元。</dd>
+          <dt>要小心</dt><dd>營運長說，最大的挑戰是廠房和設備能不能準時到位、產能能不能順利拉上來。花大錢擴產，萬一需求降溫，壓力很大。</dd>
+          <dt>怎麼追蹤</dt><dd>月營收，和法說會上的毛利率。</dd>
+        </dl>
+      </div>
+      <div class="ind-card">
+        <h3>鴻海 <span class="ticker">2317</span></h3>
+        <dl>
+          <dt>在做什麼</dt><dd>組裝：把晶片、電源、機殼組成整台 AI 伺服器和整櫃設備，也組 iPhone。</dd>
+          <dt>成長證據</dt><dd>9 月營收約 1.16 兆元，年增 38.4%；1～9 月 7.67 兆元，年增 39.5%。2026 年第二季，雲端網路產品（主要是 AI 伺服器）第一次占營收一半以上（51%）。</dd>
+          <dt>要小心</dt><dd>毛利率只有約 6%（第二季 6.12%）：賺的是量，不是高價。匯率和關稅的影響很大。</dd>
+          <dt>怎麼追蹤</dt><dd>月營收（每月 5 日前後），和 AI 伺服器占營收的比例。</dd>
+        </dl>
+      </div>
+      <div class="ind-card">
+        <h3>智邦 <span class="ticker">2345</span></h3>
+        <dl>
+          <dt>在做什麼</dt><dd>網路設備：做資料中心裡的交換器，讓成千上萬台伺服器互相傳資料。</dd>
+          <dt>成長證據</dt><dd>9 月營收 403.99 億元，年增 66.1%；1～9 月 2,864.02 億元，年增 62.5%。第二季每股盈餘 19.7 元。</dd>
+          <dt>要小心</dt><dd>成長靠少數幾家美國雲端大客戶；市場擔心毛利率跟不上營收成長；法人給的目標價差很多，參考就好。</dd>
+          <dt>怎麼追蹤</dt><dd>月營收，和大客戶（雲端公司）的資本支出計畫。</dd>
+        </dl>
+      </div>
+    </div>
+    <h3 class="tool-sub">為什麼沒選聯發科</h3>
+    <p>聯發科的潛力在 AI 客製化晶片（ASIC），公司說第一顆要到 2026 年第四季才開始量產；但現在的營收還看不太出來：9 月營收年增 2.0%，1～9 月年增 5.3%，手機需求也偏弱。「未來可能很好」和「現在已經在成長」要分清楚。前者等營收真的開始跳，再追也不遲。</p>
+    <h3 class="tool-sub">自己追蹤的方法</h3>
+    <ol>
+      <li>每月 10 日前，到公開資訊觀測站看月營收：年增率是不是連續幾個月維持住。</li>
+      <li>每季看法說會：毛利率有沒有守住、公司對下一季怎麼說。</li>
+      <li>用本益比看貴不貴（<a href="lesson.html?day=31">第 31 課</a>）：好公司買太貴，一樣會虧錢。</li>
+      <li>在富途牛牛或券商 App 把這 5 檔加進自選股，用這頁學的方法看週 K 和 MA60。</li>
+    </ol>
+    <div class="sources"><p class="sources-title">資料來源</p><ul>
+      <li>TechNews 科技新報（2026-10-15）：台積電第三季營收、每股盈餘 29.43 元　<a href="https://finance.technews.tw/2026/10/15/tsmcs-third-quarter-eps-hit-a-new-high-of-nt29-43/" target="_blank" rel="noopener">開啟來源</a></li>
+      <li>TechNews 科技新報（2026-10-08）：台積電 9 月營收　<a href="https://finance.technews.tw/2026/10/08/tsmcs-september-revenue-declined-month-on-month-but-still-hit-a-new-high-for-the-same-period/" target="_blank" rel="noopener">開啟來源</a></li>
+      <li>永豐金證券（2026-10-15）：台積電法說會，2 奈米稀釋毛利率　<a href="https://www.sinotrade.com.tw/richclub/calendar/%E5%8F%B0%E7%A9%8D%E9%9B%BB-2330-%E6%B3%95%E8%AA%AA-%E7%AC%AC%E4%B8%89%E5%AD%A3EPS-29-43%E5%85%83%E5%B9%B4%E5%A2%9E68-7--%E7%AC%AC%E5%9B%9B%E5%AD%A3%E7%BE%8E%E5%85%83%E7%87%9F%E6%94%B6%E7%9C%8B523%E5%84%84%E8%87%B3543%E5%84%84%E7%BE%8E%E5%85%83-%E5%85%A8%E5%B9%B4%E5%B9%B4%E5%A2%9E%E7%B4%8444--2%E5%A5%88%E7%B1%B3%E6%94%BE%E9%87%8F%E7%A8%80%E9%87%8B%E6%AF%9B%E5%88%A9%E7%8E%87-%E8%82%A1%E5%B8%82%E8%A9%B1%E9%A1%8C-6a588173546795e51e5f5b07" target="_blank" rel="noopener">開啟來源</a></li>
+      <li>TechNews 科技新報（2026-10-12）：台達電 9 月和 1～9 月營收　<a href="https://finance.technews.tw/2026/10/12/delta-2308-202609-financial-report/" target="_blank" rel="noopener">開啟來源</a></li>
+      <li>新頭殼（2026-07-29）：台達電第二季每股盈餘 9.68 元　<a href="https://newtalk.tw/news/view/2026-07-29/1050149" target="_blank" rel="noopener">開啟來源</a></li>
+      <li>旺得富（2026-09-17）：台達電電源晶片缺貨、出貨延後　<a href="https://wantrich.chinatimes.com/news/20260917900478-420101" target="_blank" rel="noopener">開啟來源</a></li>
+      <li>財報狗：台達電 337 調查不影響產品　<a href="https://statementdog.com/news/17869" target="_blank" rel="noopener">開啟來源</a></li>
+      <li>Stocklake：台達電 52 週最高 2,585 元、10/22 收盤 1,560 元（2026-10-26 取得）</li>
+      <li>TechNews 科技新報（2026-10-12）：日月光投控 9 月和 1～9 月營收　<a href="https://finance.technews.tw/2026/10/12/aseh-3711-202609-financial-report/" target="_blank" rel="noopener">開啟來源</a></li>
+      <li>經濟日報（2026-07-30）：日月光投控資本支出調高、擴產是最大挑戰　<a href="https://money.udn.com/money/story/5612/9660824" target="_blank" rel="noopener">開啟來源</a></li>
+      <li>TechNews 科技新報（2026-10-05）：鴻海 9 月和 1～9 月營收　<a href="https://finance.technews.tw/2026/10/05/hon-hai-2317-202609-financial-report/" target="_blank" rel="noopener">開啟來源</a></li>
+      <li>INSIDE：鴻海第二季 AI 伺服器占營收過半、毛利率 6.12%　<a href="https://www.inside.com.tw/article/42074-foxconn-q2-2026-ai-server-revenue-passes-half" target="_blank" rel="noopener">開啟來源</a></li>
+      <li>TechNews 科技新報（2026-10-06）：智邦 9 月和 1～9 月營收　<a href="https://finance.technews.tw/2026/10/06/accton-2345-202609-financial-report/" target="_blank" rel="noopener">開啟來源</a></li>
+      <li>旺得富（2026-08-07）：智邦第二季每股盈餘 19.7 元　<a href="https://wantrich.chinatimes.com/news/20260807900168-420101" target="_blank" rel="noopener">開啟來源</a></li>
+      <li>旺得富（2026-09-29）：智邦毛利率的疑慮、客戶集中　<a href="https://wantrich.chinatimes.com/news/20260929900187-420101" target="_blank" rel="noopener">開啟來源</a></li>
+      <li>TechNews 科技新報（2026-10-08）：聯發科 9 月和 1～9 月營收　<a href="https://finance.technews.tw/2026/10/08/mtk-2454-202609-financial-report/" target="_blank" rel="noopener">開啟來源</a></li>
+      <li>風傳媒（2026-07-31）：聯發科法說會，ASIC 第四季量產、手機需求　<a href="https://www.storm.mg/article/11153222" target="_blank" rel="noopener">開啟來源</a></li>
+    </ul></div>
+  </section>
+
+  <section class="tool" id="archive" aria-labelledby="archive-title">
+    <h2 id="archive-title">過去的日報</h2>
+    <div id="tr-archive"></div>
+  </section>
+
+  <p class="disclaimer">本頁為教育用途，不構成買賣建議。預測只是練習，Claude 一樣會猜錯。</p>
+</main>
+<footer class="site-footer">
+  <p>本站所有內容為教育用途，不構成買賣建議。投資有賺有賠，請自己判斷。</p>
+  <p>股價資料來自 Stocklake 日線資料；美股時間是美東時間。案例數字都標了資料日期和來源。</p>
+</footer>
+<script src="js/chart.js"></script>
+<script src="js/trend-core.js"></script>
+<script src="data/us/index.js"></script>
+<script src="js/trend.js"></script>
+</body>
+</html>

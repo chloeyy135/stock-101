@@ -957,6 +957,76 @@ main {
 .guide-table th { color: var(--ink-2); font-weight: 400; font-size: 0.875rem; }
 .guide-table td:first-child { white-space: nowrap; font-weight: 700; }
 
+/* ---------- 美股日報 ---------- */
+
+.tr-date { margin: 0 0 0.3rem; color: var(--ink-2); font-size: 0.9rem; }
+.tr-title { margin: 0 0 0.75rem; font-family: var(--font-display); font-size: 1.25rem; line-height: 1.5; }
+.tr-market, .tr-events, .tr-note ul, .tr-archive-list { margin: 0 0 1rem; padding-left: 1.2rem; }
+.tr-market li, .tr-events li, .tr-note li { margin: 0.35rem 0; line-height: 1.75; }
+.tr-events b { margin-right: 0.5rem; color: var(--red-ink); }
+.tr-h4 { margin: 1.25rem 0 0.4rem; font-size: 1rem; }
+.tr-tip { margin: 1.25rem 0; padding: 1rem 1.15rem; border-radius: 12px; background: var(--red-wash); }
+.tr-tip-label { margin: 0 0 0.2rem; font-size: 0.85rem; font-weight: 700; color: var(--red-ink); }
+.tr-tip h4 { margin: 0 0 0.5rem; font-family: var(--font-display); font-size: 1.15rem; }
+.tr-tip p { margin: 0 0 0.6rem; line-height: 1.8; }
+.tr-tip p:last-child { margin-bottom: 0; }
+
+.tr-board { display: grid; grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr)); gap: 0.75rem; }
+.tr-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.3rem;
+  padding: 0.85rem 1rem;
+  border: 0;
+  border-radius: 12px;
+  background: var(--surface);
+  box-shadow: inset 0 0 0 1px var(--line);
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.tr-card:hover { box-shadow: inset 0 0 0 2px var(--red-fill); }
+.tr-card-head { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; font-size: 1.05rem; }
+.tr-card-price { font-size: 1.15rem; font-variant-numeric: tabular-nums; }
+.tr-card-line { font-size: 0.85rem; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.tr-card-note { font-size: 0.9rem; line-height: 1.6; }
+.tr-badge { display: inline-block; padding: 0.1rem 0.6rem; border-radius: 999px; font-size: 0.85rem; font-weight: 700; }
+.tr-badge.is-up { background: var(--red-wash); color: var(--red-ink); }
+.tr-badge.is-down { background: var(--green-wash); color: var(--green); }
+.tr-badge.is-range { box-shadow: inset 0 0 0 1px var(--line); color: var(--ink-2); }
+
+.tr-pick { margin: 0 0 0.5rem; }
+.tr-controls { margin: 0.75rem 0 0; }
+.tr-lab-name { margin: 0.25rem 0 0.5rem; font-weight: 700; }
+.tr-note, .tr-health {
+  margin: 0.75rem 0 0;
+  padding: 1rem 1.15rem;
+  border-radius: 12px;
+  background: var(--surface);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+.tr-note h3, .tr-health h3 { margin: 0 0 0.5rem; font-family: var(--font-display); font-size: 1.15rem; line-height: 1.5; }
+.tr-note-head { margin: 0 0 0.5rem; font-weight: 700; }
+.tr-plan b { margin-right: 0.35rem; }
+.tr-call, .tr-watch { margin: 0.6rem 0 0; line-height: 1.75; }
+.tr-call { padding: 0.6rem 0.8rem; border-radius: 8px; background: var(--bg); }
+.tr-health .table-wrap { margin: 0; }
+.tool-table.tr-health-table tbody th { width: 6.5rem; white-space: normal; vertical-align: top; }
+.tr-health-table td { vertical-align: top; }
+.tr-why { display: block; margin-top: 0.15rem; font-size: 0.85rem; line-height: 1.6; color: var(--ink-2); }
+.tr-steps li { margin: 0.5rem 0; line-height: 1.8; }
+.tr-score { font-weight: 700; }
+.fc-item { margin: 0 0 0.6rem; padding: 0.75rem 0.9rem; border-radius: 10px; background: var(--surface); box-shadow: inset 0 0 0 1px var(--line); }
+.fc-item.is-hit { box-shadow: inset 4px 0 0 var(--red-fill), inset 0 0 0 1px var(--line); }
+.fc-item.is-miss { box-shadow: inset 4px 0 0 var(--ink-2), inset 0 0 0 1px var(--line); }
+.fc-item p { margin: 0 0 0.35rem; line-height: 1.7; }
+.fc-why { font-size: 0.9rem; color: var(--ink-2); }
+.fc-result { font-weight: 700; }
+.tr-archive-list a[aria-current] { font-weight: 700; }
+.tw-grid .ind-card h3 { display: flex; align-items: center; gap: 0.5rem; }
+
 @media (max-width: 420px) {
   .brand { font-size: 1.15rem; }
   .site-nav { gap: 0.1rem; }
