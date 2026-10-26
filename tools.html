@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>實戰工具｜台股入門 30 天</title>
+<meta name="description" content="給完全沒買過股票的人：30 天從開戶、下第一筆零股，到看懂財報、K 線和風險控管。">
+<meta name="theme-color" content="#c42b2f">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@400;700&display=swap">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body data-page="tools">
+<a class="skip-link" href="#main">跳到主要內容</a>
+<header class="site-header">
+  <a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true"></span>台股入門 30 天</a>
+  <nav class="site-nav" aria-label="主選單">
+    <a href="index.html">今天</a>
+    <a href="lessons.html">課程</a>
+    <a href="tools.html" aria-current="page">工具</a>
+  </nav>
+</header>
+<main id="main">
+  <h1 class="page-title">實戰工具</h1>
+  <p class="page-lead">下單前算成本、算漲跌停、算該買多少，買完記下來。所有資料只存在這台裝置的瀏覽器。</p>
+  <nav class="tool-nav" aria-label="工具">
+    <a href="#cost">交易成本</a>
+    <a href="#limit">漲跌停價</a>
+    <a href="#size">停損與部位大小</a>
+    <a href="#log">我的交易紀錄</a>
+  </nav>
+
+  <section class="tool" id="cost" aria-labelledby="cost-title">
+    <h2 id="cost-title">交易成本</h2>
+    <p class="tool-desc">算出這筆要付多少、會收到多少，以及買進後股價要到多少賣掉才不虧。手續費折數和最低手續費會記住，交易紀錄也會用同一組設定。</p>
+    <form class="tool-form" onsubmit="return false">
+      <fieldset class="seg"><legend>買或賣</legend>
+        <label><input type="radio" name="cost-side" value="buy" checked> 買進</label>
+        <label><input type="radio" name="cost-side" value="sell"> 賣出</label>
+      </fieldset>
+      <fieldset class="seg"><legend>種類</legend>
+        <label><input type="radio" name="cost-kind" value="stock" checked> 股票</label>
+        <label><input type="radio" name="cost-kind" value="etf"> ETF</label>
+      </fieldset>
+      <label class="field">價格（元）<input id="cost-price" type="number" inputmode="decimal" step="0.01" min="0" placeholder="例如 2385"></label>
+      <label class="field">股數<input id="cost-qty" type="number" inputmode="numeric" step="1" min="1" placeholder="零股 1～999"></label>
+      <label class="field">手續費折數<input id="fee-discount" type="number" inputmode="decimal" step="0.1" min="0.1" max="10"><small>不打折填 10，6 折填 6</small></label>
+      <label class="field">最低手續費（元）<input id="fee-min" type="number" inputmode="numeric" step="1" min="0"><small>整股常見 20 元；零股有券商 1 元</small></label>
+    </form>
+    <div class="tool-out" id="cost-out" aria-live="polite"></div>
+  </section>
+
+  <section class="tool" id="limit" aria-labelledby="limit-title">
+    <h2 id="limit-title">漲跌停價</h2>
+    <p class="tool-desc">用昨天的收盤價算今天的漲停和跌停價，自動取到升降單位的刻度。</p>
+    <form class="tool-form" onsubmit="return false">
+      <label class="field">昨收（元）<input id="limit-prev" type="number" inputmode="decimal" step="0.01" min="0" placeholder="例如 2205"></label>
+      <fieldset class="seg"><legend>種類</legend>
+        <label><input type="radio" name="limit-kind" value="stock" checked> 股票</label>
+        <label><input type="radio" name="limit-kind" value="etf"> ETF</label>
+      </fieldset>
+    </form>
+    <div class="tool-out" id="limit-out" aria-live="polite"></div>
+  </section>
+
+  <section class="tool" id="size" aria-labelledby="size-title">
+    <h2 id="size-title">停損與部位大小</h2>
+    <p class="tool-desc">先決定每筆最多願意賠多少，再算出最多可以買幾股。公式：願意賠的錢 ÷（買進價 − 停損價）。</p>
+    <form class="tool-form" onsubmit="return false">
+      <label class="field">練習資金（元）<input id="size-capital" type="number" inputmode="numeric" step="100" min="0" placeholder="例如 50000"></label>
+      <label class="field">每筆最多願意賠（%）<input id="size-risk" type="number" inputmode="decimal" step="0.5" min="0" value="2"></label>
+      <label class="field">買進價（元）<input id="size-buy" type="number" inputmode="decimal" step="0.01" min="0"></label>
+      <label class="field">停損價（元）<input id="size-stop" type="number" inputmode="decimal" step="0.01" min="0"></label>
+    </form>
+    <div class="tool-out" id="size-out" aria-live="polite"></div>
+  </section>
+
+  <section class="tool" id="log" aria-labelledby="log-title">
+    <h2 id="log-title">我的交易紀錄</h2>
+    <p class="tool-desc">每成交一筆就記下來，連同買的理由和出場條件。手續費和交易稅會照上面的設定先幫你算好，可以改成成交回報上的實際金額。</p>
+    <form class="tool-form" id="trade-form">
+      <label class="field">日期<input id="t-date" type="date"></label>
+      <label class="field">買或賣<select id="t-side"><option value="buy">買進</option><option value="sell">賣出</option></select></label>
+      <label class="field">種類<select id="t-kind"><option value="stock">股票</option><option value="etf">ETF</option></select></label>
+      <label class="field">代號<input id="t-code" type="text" autocomplete="off" placeholder="例如 0050"></label>
+      <label class="field">名稱<input id="t-name" type="text" autocomplete="off" placeholder="例如 元大台灣50"></label>
+      <label class="field">成交價（元）<input id="t-price" type="number" inputmode="decimal" step="0.01" min="0"></label>
+      <label class="field">股數<input id="t-qty" type="number" inputmode="numeric" step="1" min="1"></label>
+      <label class="field">手續費（元）<input id="t-fee" type="number" inputmode="numeric" step="1" min="0"></label>
+      <label class="field">交易稅（元）<input id="t-tax" type="number" inputmode="numeric" step="1" min="0"></label>
+      <label class="field field-wide">理由和出場條件<textarea id="t-note" rows="3" placeholder="例如：看得懂、成交量大；跌破買價 8% 或營收年增轉負就賣"></textarea></label>
+      <div class="field-wide"><button type="submit" class="btn">記下這筆</button></div>
+    </form>
+    <p class="tool-msg" id="t-msg" aria-live="polite"></p>
+    <h3 class="tool-sub">持股摘要</h3>
+    <div id="t-summary"></div>
+    <h3 class="tool-sub">全部紀錄</h3>
+    <div id="t-list"></div>
+    <h3 class="tool-sub">備份</h3>
+    <p class="tool-desc">紀錄只存在這台裝置。換手機或清除瀏覽器資料前，先複製備份文字存起來。</p>
+    <div class="tool-actions">
+      <button type="button" class="btn btn-quiet" id="backup-btn">複製備份</button>
+      <button type="button" class="btn btn-quiet" id="restore-btn">還原備份</button>
+    </div>
+    <label class="sr-only" for="backup-text">備份文字</label>
+    <textarea id="backup-text" class="backup-text" rows="4" hidden></textarea>
+    <p class="tool-msg" id="backup-msg" aria-live="polite"></p>
+  </section>
+</main>
+<footer class="site-footer">
+  <p>本站所有內容為教育用途，不構成買賣建議。投資有賺有賠，請自己判斷。</p>
+  <p>案例數字都標了資料日期和來源；股價每天在變，請以最新公告為準。</p>
+</footer>
+<script src="js/tools.js"></script>
+</body>
+</html>
