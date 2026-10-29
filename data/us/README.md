@@ -21,6 +21,7 @@
 1. 同步：`git fetch origin claude/festive-wright-5t36uk`，再 `git checkout -B claude/festive-wright-5t36uk origin/claude/festive-wright-5t36uk`（工作區要是乾淨的）。
 2. 抓資料：對 SPY、TSLA、GOOG、NVDA、AAPL、COST 各呼叫一次 Stocklake `get_stock_history`（`days: 5`）。把六個 `history` 陣列照抄成一個 JSON：`{ "SPY": [...], "TSLA": [...], ... }`，存到暫存資料夾。
 3. `node tools/us-daily.js add-bars 那個檔案.json`：加上新的 K 線，也會用新抓到的數字蓋過最近幾天的舊數字（資料商常在隔天修正最後一天的收盤和成交量；有修正就在日報的 check 寫更正）。如果「新增 0 根」，代表美股休市，今天不寫日報，到此結束。
+   注意：Stocklake 最後一天的日 K 常是收盤前的快照。再呼叫 `get_stock` 看收盤後的 `price`，兩者差很多時，日報裡最後一天的數字要寫成「暫定」，隔天 add-bars 會自動換成修正後的數字。
 4. `node tools/us-daily.js snapshot`：印出每檔的體檢表、支撐壓力、最近 5 天收盤，和每一筆練習預測的結果。
 5. 查這週的大事：Stocklake `get_earnings_calendar`、`get_economic_calendar`、`get_stock_news`、`get_market_pulse`（恐懼貪婪指數、VIX）。
 6. 寫 `report-台灣日期.js`，格式照最近一份日報。每個數字都要來自 snapshot 或有來源的資料，查不到就不寫。
