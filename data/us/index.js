@@ -1,6 +1,6 @@
 // 美股日報的資料目錄：網頁照這裡列的檔案載入。由 tools/us-daily.js 自動更新，不用手改。
 window.US_INDEX = {
-  "updated": "2026-10-31",
+  "updated": "2026-11-03",
   "files": [
     "seed-AAPL.js",
     "seed-COST.js",
@@ -9,7 +9,9 @@ window.US_INDEX = {
     "seed-SPY.js",
     "seed-TSLA.js",
     "bars-2026-10.js",
-    "calls-2026-10.js"
+    "bars-2026-11.js",
+    "calls-2026-10.js",
+    "calls-2026-11.js"
   ],
   "reports": [
     "2026-10-26",
@@ -17,6 +19,7 @@ window.US_INDEX = {
     "2026-10-28",
     "2026-10-29",
     "2026-10-30",
-    "2026-10-31"
+    "2026-10-31",
+    "2026-11-03"
   ]
 };
