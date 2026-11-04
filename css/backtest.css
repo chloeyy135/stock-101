@@ -1,0 +1,17 @@
+/* 台股入門 60 天 — 回測頁專用樣式（共用樣式在 style.css） */
+.bt-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.bt-board tbody tr { cursor: pointer; }
+.bt-board tbody tr:hover, .bt-board tbody tr:focus-visible { background: var(--red-wash); outline: none; }
+.tool-table tr.is-active th, .tool-table tr.is-active td { background: var(--red-wash); }
+.tool-table.wide tbody th { width: auto; }
+.bt-pos { color: var(--red-ink); }
+.bt-neg { color: var(--green); }
+.bt-chart { margin: 0.5rem 0 0.75rem; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); padding: 0.25rem; }
+.bt-svg { display: block; }
+.bt-grid { stroke: var(--line); stroke-width: 1; }
+.bt-base { stroke: var(--ink-2); stroke-width: 1; stroke-dasharray: 4 4; }
+.bt-axis { fill: var(--ink-2); font-size: 11px; font-variant-numeric: tabular-nums; }
+.bt-legend { display: flex; flex-wrap: wrap; gap: 0.5rem 1.25rem; margin: 0.5rem 0 0; font-size: 0.9rem; color: var(--ink-2); }
+.bt-key { display: inline-flex; align-items: center; gap: 0.4rem; }
+.bt-key i { display: inline-block; width: 1.25rem; height: 3px; border-radius: 2px; }
+.bt-syms legend { font-weight: 700; }
