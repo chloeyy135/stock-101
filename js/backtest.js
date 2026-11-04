@@ -31,6 +31,14 @@
     return c;
   }
   function label(id) { var s = R.results[id].symbol; return s.name + '（' + s.id.replace('.TW', '') + '）'; }
+  // 曲線在 results.js 裡是壓縮格式 { from, step, v, tail }（見 tools/backtest/report.py），這裡還原成 [[日期, 值], ...]
+  function expand(e) {
+    if (!e || !e.v) return [];
+    var t0 = Date.parse(e.from), pts = [];
+    for (var i = 0; i < e.v.length; i++) pts.push([new Date(t0 + i * e.step * 86400000).toISOString().slice(0, 10), e.v[i]]);
+    if (e.tail) pts.push(e.tail);
+    return pts;
+  }
 
   if (!R || !R.order || !R.order.length) {
     el('bt-error').hidden = false;
@@ -153,7 +161,7 @@
     var r = R.results[state.sym];
     el('bt-name').textContent = label(state.sym) + '　' + r.first + '～' + r.last + (r.adjusted ? '（含息）' : '（不含息）');
     var series = TIMING.filter(function (s) { return r.results[s]; }).map(function (s) {
-      return { id: s, name: STRAT[s].name, color: COLORS[s], points: r.results[s].equity, width: s === 'buy_hold' ? 2.5 : 1.75 };
+      return { id: s, name: STRAT[s].name, color: COLORS[s], points: expand(r.results[s].equity), width: s === 'buy_hold' ? 2.5 : 1.75 };
     });
     legend(el('bt-legend'), series);
     drawLines(el('bt-chart'), series, { log: state.scale === 'log', baseline: 1, fmt: function (v) { return v >= 10 ? v.toFixed(0) : v.toFixed(2); } });
@@ -204,8 +212,8 @@
     var k = d.metrics;
     el('bt-dca-desc').textContent = label(state.sym) + '：從 ' + k.start + ' 起每個月第一個交易日投入 ' + money(k.amount, m) + '，共買 ' + k.buys + ' 次，到 ' + k.end + ' 為止。';
     var series = [
-      { name: '市值', color: COLORS.dca_value, points: d.equity, width: 2.5 },
-      { name: '累計投入', color: COLORS.dca_invested, points: d.invested, width: 1.5 }
+      { name: '市值', color: COLORS.dca_value, points: expand(d.equity), width: 2.5 },
+      { name: '累計投入', color: COLORS.dca_invested, points: expand(d.invested), width: 1.5 }
     ];
     legend(el('bt-dca-legend'), series);
     drawLines(el('bt-dca-chart'), series, { fmt: function (v) { return v >= 1e6 ? (v / 1e6).toFixed(1) + 'M' : v >= 1e3 ? (v / 1e3).toFixed(0) + 'k' : v.toFixed(0); } });

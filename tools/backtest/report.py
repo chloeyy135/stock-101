@@ -4,9 +4,12 @@ import math
 from . import engine, metrics, strategies
 
 
+MAX_POINTS = 260  # 每條曲線最多存幾個點（約 5 年的週線），檔案才不會隨歷史長度無限變大
+
+
 def _clean(x):
-    if isinstance(x, float) and not math.isfinite(x):
-        return None
+    if isinstance(x, float):
+        return round(x, 6) if math.isfinite(x) else None
     if isinstance(x, dict):
         return {k: _clean(v) for k, v in x.items()}
     if isinstance(x, list):
@@ -15,11 +18,28 @@ def _clean(x):
 
 
 def weekly_points(series, digits=4):
+    """曲線的壓縮格式：每週最後一天取一點，太長就再每 k 週取一點。
+    回傳 {'from': 第一個點的日期, 'step': 點和點之間隔幾天, 'v': 數值}；最後一天不在格線上就另外放在 'tail'。
+    網頁的 js/backtest.js 用 expand() 還原成 [[日期, 值], ...]。"""
     w = series.resample('W-FRI').last().dropna()
-    if len(series) and (len(w) == 0 or w.index[-1] != series.index[-1]):
-        w = w.copy()
-        w[series.index[-1]] = series.iloc[-1]
-    return [[d.strftime('%Y-%m-%d'), round(float(v), digits)] for d, v in w.items()]
+    k = 1
+    if len(w) > MAX_POINTS:
+        k = -(-len(w) // MAX_POINTS)
+        w = w.iloc[::k]
+    out = {'from': w.index[0].strftime('%Y-%m-%d'), 'step': 7 * k, 'v': [round(float(x), digits) for x in w.values]}
+    if len(series) and w.index[-1] != series.index[-1]:
+        out['tail'] = [series.index[-1].strftime('%Y-%m-%d'), round(float(series.iloc[-1]), digits)]
+    return out
+
+
+def expand_points(e):
+    """weekly_points 的反運算（測試和其他 Python 工具用）。"""
+    import datetime as dt
+    d0 = dt.date.fromisoformat(e['from'])
+    pts = [[(d0 + dt.timedelta(days=i * e['step'])).isoformat(), v] for i, v in enumerate(e['v'])]
+    if e.get('tail'):
+        pts.append(list(e['tail']))
+    return pts
 
 
 def _common(eq, cfg):

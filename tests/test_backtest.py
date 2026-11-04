@@ -177,7 +177,22 @@ class ReportTests(unittest.TestCase):
         self.assertEqual(set(out['results']), {'buy_hold', 'dca', 'sma_cross', 'sma_filter'})
         m = out['results']['buy_hold']['metrics']
         self.assertTrue(m['cagr'] > 0 and m['mdd'] <= 0)
-        self.assertTrue(len(out['results']['buy_hold']['equity']) < 600)  # 週線取樣
+        eq = report.expand_points(out['results']['buy_hold']['equity'])
+        self.assertTrue(len(eq) < 600)  # 週線取樣
+        self.assertEqual(eq[-1][0], df.index[-1].strftime('%Y-%m-%d'))
+        self.assertEqual(eq[0][0], out['results']['buy_hold']['equity']['from'])
+
+    def test_long_history_caps_curve_points(self):
+        df = make_df(geometric(5200, 0.0003))  # 約 20 年
+        cfg = {'strategies': {'buy_hold': {}, 'dca': {}}, 'rolling_years': [1], 'min_bars_for_ma': 260, 'dca_amount': {'tw': 10000, 'us': 300}}
+        out = report.summarize({'id': 'T', 'name': 'Test', 'market': 'tw', 'kind': 'etf'}, df, cfg, costs.FREE)
+        eq = report.expand_points(out['results']['buy_hold']['equity'])
+        self.assertLessEqual(len(eq), report.MAX_POINTS + 1)
+        self.assertEqual(eq[-1][0], df.index[-1].strftime('%Y-%m-%d'))
+        self.assertLessEqual(len(out['results']['dca']['equity']['v']), report.MAX_POINTS)
+        # 格線上的日期要和原始週線一致
+        w = out['results']['buy_hold']['equity']
+        self.assertEqual(eq[1][0], (pd.Timestamp(w['from']) + pd.Timedelta(days=w['step'])).strftime('%Y-%m-%d'))
 
     def test_short_history_skips_ma_strategies(self):
         df = make_df(geometric(100, 0.001))
