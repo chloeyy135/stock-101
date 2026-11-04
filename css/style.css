@@ -1056,3 +1056,12 @@ main {
   .site-header, .site-nav, .read-box, .pager, .site-footer { display: none; }
   body { background: #fff; }
 }
+
+/* 策略回測實驗室 */
+.bt-chart { display: block; width: 100%; height: auto; margin: 0.25rem 0 1rem; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; }
+.bt-legend { font-size: 0.9rem; color: var(--ink-2); margin: 0.5rem 0 0; }
+.bt-key { display: inline-block; width: 1.25rem; height: 0; border-top: 2px solid; vertical-align: middle; margin-right: 0.35rem; }
+.bt-key.s1 { border-color: var(--s1); }
+.bt-key.s2 { border-color: var(--s2); }
+.bt-key.base { border-top: 1px dashed var(--ink-2); }
+.tool-form .field[hidden] { display: none; }
