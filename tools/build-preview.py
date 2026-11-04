@@ -9,6 +9,7 @@ repo = pathlib.Path(sys.argv[1]); out = pathlib.Path(sys.argv[2])
 read = lambda p: (repo / p).read_text(encoding='utf-8')
 css, lessons, app, tools, chart = read('css/style.css'), read('js/lessons.js'), read('js/app.js'), read('js/tools.js'), read('js/chart.js')
 core, trend, us = read('js/trend-core.js'), read('js/trend.js'), read('js/us.js')
+backtest = read('js/backtest.js')
 
 # 深淺色：尊重看的人在 claude.ai 上選的主題
 m = re.search(r'@media \(prefers-color-scheme: dark\) \{\n  :root \{(.*?)\n  \}\n\}', css, re.S)
@@ -25,7 +26,7 @@ def rep(s, a, b):
 def links(s):
     s = re.sub(r'href="lesson\.html\?day=(\d+)"', r'href="#day-\1"', s)
     s = s.replace('href="guide.html#lab"', 'href="#lab"').replace('href="guide.html"', 'href="#guide"')
-    s = s.replace('href="trend.html"', 'href="#trend"').replace('href="us.html"', 'href="#us"')
+    s = s.replace('href="trend.html"', 'href="#trend"').replace('href="us.html"', 'href="#us"').replace('href="backtest.html"', 'href="#backtest"')
     s = s.replace('href="tools.html"', 'href="#tools"').replace('href="lessons.html"', 'href="#lessons"').replace('href="index.html"', 'href="#home"')
     return s
 
@@ -34,9 +35,9 @@ def main_of(page):
     a = html.index('<main id="main">') + len('<main id="main">')
     return links(html[a:html.index('</main>')])
 
-pages = {'tools': main_of('tools.html'), 'guide': main_of('guide.html'), 'trend': main_of('trend.html'), 'us': main_of('us.html')}
+pages = {'tools': main_of('tools.html'), 'guide': main_of('guide.html'), 'trend': main_of('trend.html'), 'us': main_of('us.html'), 'backtest': main_of('backtest.html')}
 anchors = {}
-for name in ['tools', 'guide', 'trend', 'us']:
+for name in ['tools', 'guide', 'trend', 'us', 'backtest']:
     for i in re.findall(r'\sid="([^"]+)"', pages[name]):
         key = i if i not in anchors else name + '-' + i
         if key != i:
@@ -57,8 +58,8 @@ app = rep(app, "    var page = document.body.getAttribute('data-page');",
     if (h === 'main') return;
     var dm = /^day-(\\d+)$/.exec(h);
     var anchor = window.__anchors[h];
-    var page = dm ? 'lesson' : h === 'lessons' ? 'catalog' : h === 'tools' || h === 'guide' || h === 'trend' || h === 'us' ? h : anchor ? anchor[0] : 'home';
-    var isStatic = page === 'tools' || page === 'guide' || page === 'trend' || page === 'us';
+    var page = dm ? 'lesson' : h === 'lessons' ? 'catalog' : h === 'tools' || h === 'guide' || h === 'trend' || h === 'us' || h === 'backtest' ? h : anchor ? anchor[0] : 'home';
+    var isStatic = page === 'tools' || page === 'guide' || page === 'trend' || page === 'us' || page === 'backtest';
     window.__previewDay = dm ? +dm[1] : null;
     document.getElementById('main').hidden = isStatic;
     var box = document.getElementById('page-static');
@@ -153,6 +154,9 @@ window.__run = {{
   guide: function () {{ window.__runChart(); }},
   us: function () {{
 {us}
+  }},
+  backtest: function () {{
+{backtest}
   }},
   trend: function () {{
     window.__runChart();
