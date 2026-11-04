@@ -1,0 +1,4 @@
+# 回測自動化要用的套件：pip install -r tools/requirements.txt
+pandas>=2.0
+numpy>=1.24
+yfinance>=0.2.40

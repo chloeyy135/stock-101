@@ -1,0 +1,33 @@
+{
+  "_comment": "回測的設定。要加標的就在 symbols 加一行（id 用 Yahoo Finance 的代號，台股加 .TW）。金額：台股 NT$、美股 US$。",
+  "symbols": [
+    { "id": "0050.TW", "name": "元大台灣 50", "market": "tw", "kind": "etf" },
+    { "id": "006208.TW", "name": "富邦台 50", "market": "tw", "kind": "etf" },
+    { "id": "0056.TW", "name": "元大高股息", "market": "tw", "kind": "etf" },
+    { "id": "00878.TW", "name": "國泰永續高股息", "market": "tw", "kind": "etf" },
+    { "id": "2330.TW", "name": "台積電", "market": "tw", "kind": "stock" },
+    { "id": "SPY", "name": "SPDR 標普 500", "market": "us", "kind": "etf" },
+    { "id": "QQQ", "name": "Invesco 那斯達克 100", "market": "us", "kind": "etf" },
+    { "id": "VT", "name": "Vanguard 全世界股票", "market": "us", "kind": "etf" },
+    { "id": "AAPL", "name": "蘋果", "market": "us", "kind": "stock" },
+    { "id": "NVDA", "name": "輝達", "market": "us", "kind": "stock" },
+    { "id": "GOOG", "name": "Alphabet（Google）", "market": "us", "kind": "stock" },
+    { "id": "TSLA", "name": "特斯拉", "market": "us", "kind": "stock" },
+    { "id": "COST", "name": "好市多", "market": "us", "kind": "stock" }
+  ],
+  "strategies": {
+    "buy_hold": {},
+    "dca": {},
+    "sma_cross": { "fast": 20, "slow": 60 },
+    "sma_filter": { "n": 200 }
+  },
+  "dca_amount": { "tw": 10000, "us": 300 },
+  "costs": {
+    "tw": { "fee_rate": 0.001425, "fee_discount": 0.6, "tax": { "etf": 0.001, "stock": 0.003 } },
+    "us": { "fee_rate": 0, "fee_discount": 1, "tax": { "etf": 0, "stock": 0 } }
+  },
+  "min_bars_for_ma": 260,
+  "rolling_years": [1, 3, 5, 10],
+  "history_dir": "data/history",
+  "output_dir": "data/backtest"
+}

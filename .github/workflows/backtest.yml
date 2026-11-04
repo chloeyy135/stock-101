@@ -1,0 +1,62 @@
+# 每週自動更新回測：抓最新日線 → 重跑回測 → 把結果推回這個分支。
+# 也可以在 GitHub 的 Actions 頁手動按 Run workflow。
+name: 回測自動更新
+
+on:
+  schedule:
+    # UTC 週六 01:17 ＝ 台灣時間週六 09:17（台美股這週都收完）
+    - cron: '17 1 * * 6'
+  workflow_dispatch:
+    inputs:
+      symbols:
+        description: '只抓這幾檔（空白代表全部），用空白隔開，例如 0050.TW SPY'
+        required: false
+        default: ''
+
+permissions:
+  contents: write
+
+concurrency:
+  group: backtest-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  backtest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: tools/requirements.txt
+
+      - name: 安裝套件
+        run: pip install -r tools/requirements.txt
+
+      - name: 回測引擎測試
+        run: python -m unittest discover -s tests
+
+      - name: 抓歷史日線（Yahoo Finance）
+        env:
+          SYMBOLS: ${{ github.event.inputs.symbols }}
+        run: python tools/fetch_history.py $SYMBOLS
+
+      - name: 重跑回測
+        run: python tools/run_backtest.py
+
+      - name: 推回分支
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/history data/backtest
+          if git diff --cached --quiet; then
+            echo "沒有變更，不用 commit"
+            exit 0
+          fi
+          git commit -m "Update the backtest data and results for $(date -u +%Y-%m-%d)"
+          git push origin HEAD:${{ github.ref_name }}
