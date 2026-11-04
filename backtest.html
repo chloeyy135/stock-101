@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>策略回測實驗室 — 台股入門 60 天</title>
+<meta name="description" content="把一條簡單的買賣規則套到過去的美股日線，和一直抱著比一比：自動交易的第一步是回測。">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body data-page="backtest">
+<a class="skip-link" href="#main">跳到主要內容</a>
+<header class="site-header">
+  <a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true"></span>台股入門 60 天</a>
+  <nav class="site-nav" aria-label="主選單">
+    <a href="index.html">今天</a>
+    <a href="lessons.html">課程</a>
+    <a href="us.html" aria-current="page">美股</a>
+    <a href="trend.html">日報</a>
+    <a href="guide.html">看盤</a>
+    <a href="tools.html">工具</a>
+  </nav>
+</header>
+<main id="main">
+  <h1 class="page-title">策略回測實驗室</h1>
+  <p class="page-lead">自動交易的第一步不是寫程式下單，而是先問：「這條規則，過去真的有用嗎？」選一檔、選一條規則，看它和一直抱著誰比較好。</p>
+
+  <section class="tool" id="bt" aria-labelledby="bt-title">
+    <h2 id="bt-title">試一條規則</h2>
+    <form class="tool-form" id="bt-form" onsubmit="return false">
+      <label class="field">股票
+        <select id="bt-sym"></select>
+      </label>
+      <label class="field">規則
+        <select id="bt-rule">
+          <option value="trend">站上均線就持有，跌破就賣</option>
+          <option value="cross">短均線在長均線上面就持有（黃金交叉）</option>
+          <option value="rsi">RSI 太冷就買、太熱就賣</option>
+        </select>
+      </label>
+      <label class="field" id="bt-n1-wrap">均線天數（短）
+        <input type="number" id="bt-n1" min="2" max="120" step="1" value="20">
+      </label>
+      <label class="field" id="bt-n2-wrap">長均線天數
+        <input type="number" id="bt-n2" min="3" max="200" step="1" value="60">
+      </label>
+      <label class="field" id="bt-lo-wrap">RSI 低於多少買進
+        <input type="number" id="bt-lo" min="5" max="50" step="1" value="30">
+      </label>
+      <label class="field" id="bt-hi-wrap">RSI 高於多少賣出
+        <input type="number" id="bt-hi" min="50" max="95" step="1" value="70">
+      </label>
+      <label class="field">每次買或賣的成本（%）<small>手續費＋價差，複委託大約 0.1～0.5%</small>
+        <input type="number" id="bt-cost" min="0" max="2" step="0.05" value="0.2">
+      </label>
+    </form>
+    <div id="bt-out" aria-live="polite"><p class="tool-hint">載入中…</p></div>
+    <p class="tool-hint">怎麼算：每天收盤後看規則，隔天開盤才買或賣（不能用當天收盤價偷看答案）。資料是日報用的同一份日線，大約一年多。</p>
+  </section>
+
+  <section class="tool" id="bt-learn" aria-labelledby="bt-learn-title">
+    <h2 id="bt-learn-title">回測要小心的四件事</h2>
+    <ol class="tr-steps">
+      <li><b>調參數調出來的好成績不算數。</b>把 20 天改成 17 天剛好變很賺，多半只是剛好對上這段行情。好的規則，參數換一點點，結果也不會差太多。</li>
+      <li><b>成本會吃掉很多。</b>把成本從 0.2% 調到 0.5% 看看，交易越頻繁的規則掉得越多。</li>
+      <li><b>一檔、一段時間不夠。</b>六檔都試，贏的多才有意義；一年多的資料也太短，真正的回測至少要十年、包含大跌的年份。</li>
+      <li><b>回測贏了，下一步是模擬單，不是真錢。</b>照規則用模擬帳戶跑一到三個月，結果和回測差不多，才用小錢試。</li>
+    </ol>
+    <p class="tool-hint">本頁是教學用的簡化版，不構成買賣建議。</p>
+  </section>
+</main>
+<footer class="site-footer">
+  <p>本站所有內容為教育用途，不構成買賣建議。投資有賺有賠，請自己判斷。</p>
+  <p>案例數字都標了資料日期和來源。</p>
+</footer>
+<script src="js/chart.js"></script>
+<script src="js/trend-core.js"></script>
+<script src="data/us/index.js"></script>
+<script src="js/backtest.js"></script>
+</body>
+</html>
