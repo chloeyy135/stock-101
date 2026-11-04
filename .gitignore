@@ -1,2 +1,4 @@
 __pycache__/
 *.pyc
+# Recall 外掛在本機記錄的 session 紀錄，不放進網站
+.recall/
