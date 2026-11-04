@@ -1,14 +1,14 @@
 # 台股入門 60 天 — 把整個網站打包成一個 HTML 檔，給 claude.ai 的 Artifact 預覽用（網站本身不會用到）。
 # 用法：python3 tools/build-preview.py <repo 根目錄> <輸出的 html 檔>
-# 預覽裡的分頁改用網址 # 切換：#home、#lessons、#day-N、#tools、#guide、#trend。
-# 工具、看盤指南、美股日報放在 <template> 裡，打開時才放進 #page-static，
+# 預覽裡的分頁改用網址 # 切換：#home、#lessons、#day-N、#tools、#guide、#trend、#us。
+# 工具、看盤指南、美股日報、美股入門放在 <template> 裡，打開時才放進 #page-static，
 # 所以看盤指南和美股日報的指標實驗室（都是 id="lab"）不會同時出現。
 # 各頁裡的段落 id 會打開它所屬的那一頁；美股日報自己的 #lab 改成 #trend-lab。
 import sys, re, pathlib
 repo = pathlib.Path(sys.argv[1]); out = pathlib.Path(sys.argv[2])
 read = lambda p: (repo / p).read_text(encoding='utf-8')
 css, lessons, app, tools, chart = read('css/style.css'), read('js/lessons.js'), read('js/app.js'), read('js/tools.js'), read('js/chart.js')
-core, trend = read('js/trend-core.js'), read('js/trend.js')
+core, trend, us = read('js/trend-core.js'), read('js/trend.js'), read('js/us.js')
 
 # 深淺色：尊重看的人在 claude.ai 上選的主題
 m = re.search(r'@media \(prefers-color-scheme: dark\) \{\n  :root \{(.*?)\n  \}\n\}', css, re.S)
@@ -25,7 +25,7 @@ def rep(s, a, b):
 def links(s):
     s = re.sub(r'href="lesson\.html\?day=(\d+)"', r'href="#day-\1"', s)
     s = s.replace('href="guide.html#lab"', 'href="#lab"').replace('href="guide.html"', 'href="#guide"')
-    s = s.replace('href="trend.html"', 'href="#trend"')
+    s = s.replace('href="trend.html"', 'href="#trend"').replace('href="us.html"', 'href="#us"')
     s = s.replace('href="tools.html"', 'href="#tools"').replace('href="lessons.html"', 'href="#lessons"').replace('href="index.html"', 'href="#home"')
     return s
 
@@ -34,9 +34,9 @@ def main_of(page):
     a = html.index('<main id="main">') + len('<main id="main">')
     return links(html[a:html.index('</main>')])
 
-pages = {'tools': main_of('tools.html'), 'guide': main_of('guide.html'), 'trend': main_of('trend.html')}
+pages = {'tools': main_of('tools.html'), 'guide': main_of('guide.html'), 'trend': main_of('trend.html'), 'us': main_of('us.html')}
 anchors = {}
-for name in ['tools', 'guide', 'trend']:
+for name in ['tools', 'guide', 'trend', 'us']:
     for i in re.findall(r'\sid="([^"]+)"', pages[name]):
         key = i if i not in anchors else name + '-' + i
         if key != i:
@@ -57,14 +57,14 @@ app = rep(app, "    var page = document.body.getAttribute('data-page');",
     if (h === 'main') return;
     var dm = /^day-(\\d+)$/.exec(h);
     var anchor = window.__anchors[h];
-    var page = dm ? 'lesson' : h === 'lessons' ? 'catalog' : h === 'tools' || h === 'guide' || h === 'trend' ? h : anchor ? anchor[0] : 'home';
-    var isStatic = page === 'tools' || page === 'guide' || page === 'trend';
+    var page = dm ? 'lesson' : h === 'lessons' ? 'catalog' : h === 'tools' || h === 'guide' || h === 'trend' || h === 'us' ? h : anchor ? anchor[0] : 'home';
+    var isStatic = page === 'tools' || page === 'guide' || page === 'trend' || page === 'us';
     window.__previewDay = dm ? +dm[1] : null;
     document.getElementById('main').hidden = isStatic;
     var box = document.getElementById('page-static');
     box.hidden = !isStatic;
     if (page !== 'lesson') document.onkeydown = null;
-    var titles = { catalog: '全部課程｜', tools: '實戰工具｜', guide: '看盤指南｜', trend: '美股日報｜' };
+    var titles = { catalog: '全部課程｜', tools: '實戰工具｜', guide: '看盤指南｜', trend: '美股日報｜', us: '美股入門｜' };
     document.title = (titles[page] || '') + BRAND;
     Array.prototype.forEach.call(document.querySelectorAll('.site-nav a'), function (a) {
       if (a.getAttribute('data-nav') === page) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
@@ -117,6 +117,7 @@ page = f'''<title>台股入門 60 天</title>
   <nav class="site-nav" aria-label="主選單">
     <a href="#home" data-nav="home">今天</a>
     <a href="#lessons" data-nav="catalog">課程</a>
+    <a href="#us" data-nav="us">美股</a>
     <a href="#trend" data-nav="trend">日報</a>
     <a href="#guide" data-nav="guide">看盤</a>
     <a href="#tools" data-nav="tools">工具</a>
@@ -150,6 +151,9 @@ window.__run = {{
 {tools}
   }},
   guide: function () {{ window.__runChart(); }},
+  us: function () {{
+{us}
+  }},
   trend: function () {{
     window.__runChart();
 {trend}
