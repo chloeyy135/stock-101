@@ -148,8 +148,10 @@ test('Bootstrap 是可重現的統計模擬；情境只在資料涵蓋時計算'
 });
 
 test('和 Python 引擎一致：SPY 買進持有、均線交叉、年線濾網的年化報酬與最大回撤', () => {
-  const csv = fs.readFileSync(path.join(__dirname, '..', 'data', 'history', 'SPY.csv'), 'utf8').trim().split('\n').slice(1);
-  const b = csv.map(l => { const x = l.split(','); return { d: x[0], o: +x[1], h: +x[2], l: +x[3], c: +x[4], v: +x[5] }; });
+  // 日線用進階模式匯出的 data/backtest/bars/SPY.js（和 data/history/SPY.csv 同一份資料，但一定在 repo 裡）
+  const bars = fs.readFileSync(path.join(__dirname, '..', 'data', 'backtest', 'bars', 'SPY.js'), 'utf8');
+  const rows = JSON.parse(bars.slice(bars.indexOf('= {') + 2, bars.lastIndexOf('}') + 1)).rows;
+  const b = rows.map(x => ({ d: x[0], o: x[1], h: x[2], l: x[3], c: x[4], v: x[5] }));
   const src = fs.readFileSync(path.join(__dirname, '..', 'data', 'backtest', 'results.js'), 'utf8');
   const R = JSON.parse(src.slice(src.indexOf('{'), src.lastIndexOf('}') + 1)).results.SPY.results;
   const check = (strat, p, key) => {
