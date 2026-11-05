@@ -14,6 +14,7 @@ assert m
 dark = m.group(1)
 css = css.replace(m.group(0), '@media (prefers-color-scheme: dark) {\n  :root:not([data-theme="light"]) {' + dark + '\n    color-scheme: dark;\n  }\n}\n:root[data-theme="dark"] {' + dark + '\n  color-scheme: dark;\n}')
 html = r('backtest.html')
+bars_files = re.findall(r'<script src="(data/backtest/bars/[^"]+)"', html)
 body = html[html.index('<a class="skip-link"'):html.index('<script src="data/backtest/results.js">')]
 body = re.sub(r'href="(index|lessons|trend|guide|tools|lesson)\.html[^"]*"', 'href="#main"', body)
 body = body.replace('href="backtest.html"', 'href="#main"')
@@ -23,7 +24,7 @@ out = ('<title>歷史回測</title>\n'
        '<style>\n' + css + '\n' + r('css/backtest.css') + '\nbody{background:var(--bg);color:var(--ink)}\n</style>\n'
        + body
        + '<script>\n' + r('data/backtest/results.js') + '\n</script>\n'
-       + '<script>\n' + r('data/backtest/bars.js') + '\n</script>\n'
+       + ''.join('<script>\n' + r(f) + '\n</script>\n' for f in bars_files)
        + '<script>\n' + r('js/backtest-engine.js') + '\n</script>\n'
        + '<script>\n' + r('js/backtest.js') + '\n</script>\n'
        + '<script>\n' + r('js/backtest-lab.js') + '\n</script>\n')

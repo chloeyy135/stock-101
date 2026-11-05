@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
-"""把 data/history/*.csv 連同資料品質報告匯出成 data/backtest/bars.js（window.BACKTEST_BARS），
-給 backtest.html 的「進階模式」在瀏覽器裡重新計算用。config 裡列了但沒有 CSV 的標的會列在 missing，附原因。
+"""把 data/history/*.csv 連同資料品質報告匯出成 data/backtest/bars/（window.BACKTEST_BARS），
+給 backtest.html 的「進階模式」在瀏覽器裡重新計算用。
+index.js 放總表（產生時間、缺資料的標的和原因、順序），每檔一個 <id>.js 放日線；config 裡列了但沒有 CSV 的標的
+會寫成只有註解的空檔，backtest.html 固定載入全部標的的檔案時才不會 404。
 用法（repo 根目錄）：python3 tools/export_bars.py
 """
 import datetime as dt
@@ -54,14 +56,26 @@ def main():
             'rows': [[d.strftime('%Y-%m-%d'), round(float(r.open), 4), round(float(r.high), 4), round(float(r.low), 4), round(float(r.close), 4), int(r.volume)] for d, r in zip(df.index, df.itertuples(index=False))]
         }
         print('%-10s %5d 根 %s～%s %s' % (sid, len(df), out['symbols'][sid]['first'], out['symbols'][sid]['last'], '含息還原' if out['symbols'][sid]['adjusted'] else '未還原'))
-    out_dir = os.path.join(ROOT, cfg.get('output_dir', 'data/backtest'))
+    out_dir = os.path.join(ROOT, cfg.get('output_dir', 'data/backtest'), 'bars')
     os.makedirs(out_dir, exist_ok=True)
-    js = '// 進階模式用的日線資料：由 tools/export_bars.py 從 data/history 產生，不用手改。每檔有來源、是否還原、區間和資料品質報告。\n' \
-         'window.BACKTEST_BARS = ' + json.dumps(out, ensure_ascii=False, separators=(',', ':')) + ';\n'
-    with open(os.path.join(out_dir, 'bars.js'), 'w', encoding='utf-8') as f:
-        f.write(js)
-    print('寫入 data/backtest/bars.js（%d 檔有資料、%d 檔缺資料，%d KB）' % (len(out['order']), len(out['missing']), len(js) // 1024))
-
+    head = '// 進階模式用的日線資料：由 tools/export_bars.py 從 data/history 產生，不用手改。'
+    index = {'generated': out['generated'], 'missing': out['missing'], 'order': out['order'], 'symbols': {}}
+    total = 0
+    with open(os.path.join(out_dir, 'index.js'), 'w', encoding='utf-8') as f:
+        js = head + '總表；每檔日線在同資料夾的 <代號>.js。\n' + 'window.BACKTEST_BARS = ' + json.dumps(index, ensure_ascii=False, separators=(',', ':')) + ';\n'
+        f.write(js); total += len(js)
+    for sym in cfg['symbols']:
+        sid = sym['id']
+        if sid in out['symbols']:
+            js = head + '每檔有來源、是否還原、區間和資料品質報告。\n' + 'window.BACKTEST_BARS.symbols[%s] = %s;\n' % (json.dumps(sid), json.dumps(out['symbols'][sid], ensure_ascii=False, separators=(',', ':')))
+        else:
+            js = head + '\n// %s 目前沒有日線資料（原因見 index.js 的 missing），所以這個檔是空的。\n' % sid
+        with open(os.path.join(out_dir, sid + '.js'), 'w', encoding='utf-8') as f:
+            f.write(js); total += len(js)
+    legacy = os.path.join(ROOT, cfg.get('output_dir', 'data/backtest'), 'bars.js')
+    if os.path.exists(legacy):
+        os.remove(legacy)
+    print('寫入 data/backtest/bars/（index.js ＋ %d 檔，%d 檔有資料、%d 檔缺資料，共 %d KB）' % (len(cfg['symbols']), len(out['order']), len(out['missing']), total // 1024))
 
 if __name__ == '__main__':
     main()
