@@ -1,5 +1,5 @@
 // 瀏覽器端回測引擎的測試：node --test tests/
-// 合成資料答案事先算好；最後一組拿 Python 引擎算好的 data/backtest/results.js 當基準，確認兩邊一致。
+// 合成資料答案事先算好；最後一組拿 Python 引擎算好的 data/backtest/results/SPY.js 當基準，確認兩邊一致。
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
@@ -152,8 +152,8 @@ test('和 Python 引擎一致：SPY 買進持有、均線交叉、年線濾網�
   const bars = fs.readFileSync(path.join(__dirname, '..', 'data', 'backtest', 'bars', 'SPY.js'), 'utf8');
   const rows = JSON.parse(bars.slice(bars.indexOf('= {') + 2, bars.lastIndexOf('}') + 1)).rows;
   const b = rows.map(x => ({ d: x[0], o: x[1], h: x[2], l: x[3], c: x[4], v: x[5] }));
-  const src = fs.readFileSync(path.join(__dirname, '..', 'data', 'backtest', 'results.js'), 'utf8');
-  const R = JSON.parse(src.slice(src.indexOf('{'), src.lastIndexOf('}') + 1)).results.SPY.results;
+  const src = fs.readFileSync(path.join(__dirname, '..', 'data', 'backtest', 'results', 'SPY.js'), 'utf8');
+  const R = JSON.parse(src.slice(src.indexOf('= {') + 2, src.lastIndexOf('}') + 1)).results;
   const check = (strat, p, key) => {
     const sim = E.simulate(b, E.signals(b, strat, p), { cash0: 1, fractional: true, cost: E.COST_PRESETS.none });
     const m = E.metrics(sim.equity);

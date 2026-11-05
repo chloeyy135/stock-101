@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """讀 config/backtest.json 和 data/history/*.csv，把每檔每個策略跑一遍，寫出：
-  data/backtest/results.js   網頁用（window.BACKTEST）
+  data/backtest/results/     網頁用（window.BACKTEST）：index.js 總表 ＋ 每檔一個 <代號>.js
   data/backtest/REPORT.md    給人看的摘要表
 用法（repo 根目錄）：python3 tools/run_backtest.py
 沒有 CSV 的標的會略過並列在 missing。
@@ -93,13 +93,28 @@ def main():
     res = {'generated': dt.datetime.now(dt.timezone(dt.timedelta(hours=8))).strftime('%Y-%m-%d %H:%M'),
            'strategies': strategy_list(cfg), 'dca_amount': cfg.get('dca_amount', {}), 'costs': cfg['costs'],
            'order': order, 'missing': missing, 'results': results}
-    js = ('// 回測結果：由 tools/run_backtest.py 產生，不用手改。資料來源和區間見每檔的 source／first／last。\n'
-          'window.BACKTEST = ' + json.dumps(res, ensure_ascii=False, separators=(',', ':')) + ';\n')
-    with open(os.path.join(out_dir, 'results.js'), 'w', encoding='utf-8') as f:
-        f.write(js)
+    head = '// 回測結果：由 tools/run_backtest.py 產生，不用手改。資料來源和區間見每檔的 source／first／last。'
+    res_dir = os.path.join(out_dir, 'results')
+    os.makedirs(res_dir, exist_ok=True)
+    index = dict(res, results={})
+    total = 0
+    with open(os.path.join(res_dir, 'index.js'), 'w', encoding='utf-8') as f:
+        js = head + '總表；每檔結果在同資料夾的 <代號>.js。\n' + 'window.BACKTEST = ' + json.dumps(index, ensure_ascii=False, separators=(',', ':')) + ';\n'
+        f.write(js); total += len(js)
+    for sym in cfg['symbols']:
+        sid = sym['id']
+        if sid in results:
+            js = head + '\n' + 'window.BACKTEST.results[%s] = %s;\n' % (json.dumps(sid), json.dumps(results[sid], ensure_ascii=False, separators=(',', ':')))
+        else:
+            js = head + '\n// %s 目前沒有回測結果（原因見 index.js 的 missing），所以這個檔是空的。\n' % sid
+        with open(os.path.join(res_dir, sid + '.js'), 'w', encoding='utf-8') as f:
+            f.write(js); total += len(js)
+    legacy = os.path.join(out_dir, 'results.js')
+    if os.path.exists(legacy):
+        os.remove(legacy)
     with open(os.path.join(out_dir, 'REPORT.md'), 'w', encoding='utf-8') as f:
         f.write(markdown(res))
-    print('寫入 %s（%d 檔，%d KB）和 REPORT.md；缺資料 %d 檔' % (os.path.relpath(os.path.join(out_dir, 'results.js'), ROOT), len(order), len(js) // 1024, len(missing)))
+    print('寫入 data/backtest/results/（index.js ＋ %d 檔，%d 檔有結果、%d 檔缺資料，共 %d KB）和 REPORT.md' % (len(cfg['symbols']), len(order), len(missing), total // 1024))
     return 0
 
 
