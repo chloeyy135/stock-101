@@ -62,6 +62,7 @@ js/trend.js       美股日報的畫面和預測日記
 data/us/          美股日 K、每天的日報和練習預測（格式和每天更新的步驟見 data/us/README.md）
 tools/us-daily.js 每天更新美股日報用的指令（node），網站本身不會用到
 tools/build-preview.py 把整個網站打包成一個 HTML 檔，給 claude.ai 的預覽用
+tools/finmind_claude_analysis.py 用 FinMind 抓台股日線、交給 Claude 做技術面分析（需要 pip install anthropic FinMind 和 ANTHROPIC_API_KEY）
 ```
 
 ### 預覽某一天
