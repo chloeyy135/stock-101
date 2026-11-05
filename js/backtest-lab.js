@@ -1,5 +1,5 @@
 /* 台股入門 60 天 — 回測頁「進階模式」：在瀏覽器裡用 js/backtest-engine.js 真的重新計算。
-   資料來自 data/backtest/bars.js（window.BACKTEST_BARS），每一個數字都能由「資料版本＋參數＋成本」重現。 */
+   資料來自 data/backtest/bars/（window.BACKTEST_BARS，index.js 加每檔一個 js），每一個數字都能由「資料版本＋參數＋成本」重現。 */
 (function () {
   'use strict';
   var E = window.BacktestEngine, D = window.BACKTEST_BARS;
@@ -92,7 +92,7 @@
   var opts_heat_scale = 0.1;
 
   // ---------- 狀態 ----------
-  if (!E || !D) { var err = el('lab-error'); if (err) { err.hidden = false; err.textContent = '進階模式需要 js/backtest-engine.js 和 data/backtest/bars.js，目前沒有載入。'; } return; }
+  if (!E || !D) { var err = el('lab-error'); if (err) { err.hidden = false; err.textContent = '進階模式需要 js/backtest-engine.js 和 data/backtest/bars/index.js，目前沒有載入。'; } return; }
   var SYMS = D.order.map(function (id) { var s = D.symbols[id]; s.data = s.rows.map(function (r) { return { d: r[0], o: r[1], h: r[2], l: r[3], c: r[4], v: r[5] }; }); s.validation = E.validate(s.data); return s; });
   var byId = {}; SYMS.forEach(function (s) { byId[s.id] = s; });
   var STORE_KEY = 'bt-lab-settings-v1';
