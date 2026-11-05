@@ -31,6 +31,7 @@
   <p class="page-lead">用真的歷史資料回答課程裡反覆出現的問題：長期持有會怎樣？定期定額呢？用均線進出有沒有比較好？最慘的一段會賠多少？數字每週由程式自動重算，<span id="bt-generated"></span></p>
   <p class="tool-error" id="bt-error" hidden></p>
   <nav class="tool-nav" aria-label="回測">
+    <a href="#lab" class="lab-only">進階模式</a>
     <a href="#board">總覽</a>
     <a href="#curve">權益曲線</a>
     <a href="#compare">策略比較</a>
@@ -39,6 +40,131 @@
     <a href="#rolling">抱 N 年會怎樣</a>
     <a href="#method">方法和限制</a>
   </nav>
+
+
+  <form class="lab-controls" onsubmit="return false">
+    <fieldset class="seg"><legend>模式</legend>
+      <label><input type="radio" name="lab-mode-r" value="simple" checked> 簡易模式（一鍵看結果）</label>
+      <label><input type="radio" name="lab-mode-r" value="advanced"> 進階模式（自訂參數、真的重算）</label>
+    </fieldset>
+    <select id="lab-mode" class="sr-only" aria-hidden="true"><option value="simple">simple</option><option value="advanced">advanced</option></select>
+  </form>
+
+  <section class="tool lab-only" id="lab" aria-labelledby="lab-title">
+    <h2 id="lab-title">進階模式：自訂回測</h2>
+    <p class="tool-desc">所有數字都在你的瀏覽器裡用 <code>js/backtest-engine.js</code> 重新計算，不是切換預先算好的結果。規則：收盤出訊號、隔天開盤成交、均線暖機期不算績效、整股成交、成本和利率都是可改的假設值。<span id="lab-data-version"></span></p>
+    <p class="tool-error" id="lab-error" hidden></p>
+
+    <h3 class="tool-sub">資料來源與品質</h3>
+    <div class="bt-scroll" id="lab-data"></div>
+    <div id="lab-data-issues"></div>
+
+    <h3 class="tool-sub">設定</h3>
+    <form class="tool-form lab-form" id="lab-form" onsubmit="return false">
+      <fieldset class="lab-fs field-wide"><legend>標的（可多選）</legend>
+        <label class="field">搜尋<input type="search" id="lab-sym-search" placeholder="代號或名稱"></label>
+        <div class="lab-syms" id="lab-syms"></div>
+      </fieldset>
+      <fieldset class="lab-fs field-wide"><legend>區間與資金</legend>
+        <label class="field">開始日<input type="date" id="lab-start"></label>
+        <label class="field">結束日<input type="date" id="lab-end"></label>
+        <label class="field">多檔比較的區間<select id="lab-period"><option value="own">各自可用區間</option><option value="common">共同交集區間</option></select></label>
+        <label class="field">初始資金<input type="number" id="lab-cash0" value="1000000" min="1" step="1000" inputmode="numeric"><small>單位是標的幣別</small></label>
+      </fieldset>
+      <fieldset class="lab-fs field-wide"><legend>策略與參數</legend>
+        <label class="field">策略<select id="lab-strategy"></select></label>
+        <div class="lab-params" id="lab-params"></div>
+        <label class="field">停損（%，0 = 不用）<input type="number" id="lab-stop" value="0" min="0" max="90" step="1"></label>
+        <label class="field">停利（%，0 = 不用）<input type="number" id="lab-take" value="0" min="0" max="500" step="1"></label>
+      </fieldset>
+      <fieldset class="lab-fs field-wide"><legend>成本與現金（預設值是假設，請照你的券商改）</legend>
+        <label class="field">成本範本<select id="lab-cost-preset"></select></label>
+        <label class="field">手續費率（%）<input type="number" id="lab-c-feeRate" step="0.0001" min="0"></label>
+        <label class="field">手續費折扣（0.6 = 六折）<input type="number" id="lab-c-feeDiscount" step="0.1" min="0" max="1"></label>
+        <label class="field">最低手續費<input type="number" id="lab-c-minFee" step="1" min="0"></label>
+        <label class="field">交易稅（%，賣出）<input type="number" id="lab-c-taxRate" step="0.01" min="0"></label>
+        <label class="field">每筆佣金<input type="number" id="lab-c-commission" step="0.01" min="0"></label>
+        <label class="field">最低佣金<input type="number" id="lab-c-minCommission" step="0.01" min="0"></label>
+        <label class="field">滑價（bps）<input type="number" id="lab-c-slipBps" step="1" min="0"></label>
+        <label class="field">閒置現金年利率（%）<input type="number" id="lab-cashrate" value="0" step="0.1" min="0"></label>
+        <label class="field lab-check"><input type="checkbox" id="lab-fractional"> 允許碎股（零股以下）</label>
+        <label class="field lab-check"><input type="checkbox" id="lab-closeout"> 期末結清並扣賣出成本</label>
+      </fieldset>
+      <fieldset class="lab-fs field-wide"><legend>定期定額</legend>
+        <label class="field">每期金額<input type="number" id="lab-dca-amount" value="10000" min="1" step="100"></label>
+        <label class="field">每月幾號投入<input type="number" id="lab-dca-day" value="1" min="1" max="28" step="1"></label>
+        <label class="field">頻率<select id="lab-dca-freq"><option value="M">每月</option><option value="BW">每兩週</option><option value="Q">每季</option></select></label>
+        <label class="field">主要投入法<select id="lab-dca-variant"><option value="fixed">固定金額</option><option value="dip">逢跌加碼</option><option value="tranche">分批投入</option></select></label>
+        <label class="field">逢跌門檻（%）<input type="number" id="lab-dca-dip" value="10" min="1" max="60"></label>
+        <label class="field">逢跌加碼倍數<input type="number" id="lab-dca-mult" value="2" min="1" max="10" step="0.5"></label>
+        <label class="field">分批期數<input type="number" id="lab-dca-tranches" value="12" min="1" max="60"></label>
+      </fieldset>
+      <fieldset class="lab-fs field-wide"><legend>投資組合（勾兩檔以上、同幣別）</legend>
+        <div class="lab-params" id="lab-weights"></div>
+        <label class="field">現金權重（%）<input type="number" id="lab-cashw" value="0" min="0" max="100"></label>
+        <label class="field">再平衡<select id="lab-rebalance"><option value="none">不再平衡</option><option value="M">每月</option><option value="Q" selected>每季</option><option value="Y">每年</option><option value="T">偏離門檻</option></select></label>
+        <label class="field">偏離門檻（%）<input type="number" id="lab-threshold" value="5" min="1" max="50"></label>
+      </fieldset>
+      <fieldset class="lab-fs field-wide"><legend>進階研究（參數網格只對均線交叉）</legend>
+        <label class="field">訓練期占比（%）<input type="number" id="lab-split" value="70" min="30" max="90"></label>
+        <label class="field">快線 從<input type="number" id="lab-g-fast-from" value="5" min="2"></label>
+        <label class="field">快線 到<input type="number" id="lab-g-fast-to" value="30" min="3"></label>
+        <label class="field">快線 間隔<input type="number" id="lab-g-fast-step" value="5" min="1"></label>
+        <label class="field">慢線 從<input type="number" id="lab-g-slow-from" value="40" min="3"></label>
+        <label class="field">慢線 到<input type="number" id="lab-g-slow-to" value="120" min="4"></label>
+        <label class="field">慢線 間隔<input type="number" id="lab-g-slow-step" value="20" min="1"></label>
+        <label class="field">Walk-forward 訓練（年）<input type="number" id="lab-wf-train" value="0.5" min="0.25" step="0.25"></label>
+        <label class="field">Walk-forward 測試（月）<input type="number" id="lab-wf-test" value="2" min="1" step="1"></label>
+        <label class="field">Bootstrap 路徑數<input type="number" id="lab-mc-paths" value="500" min="100" max="5000" step="100"></label>
+        <label class="field">Bootstrap 天數<input type="number" id="lab-mc-h" value="252" min="20" max="2520" step="10"></label>
+      </fieldset>
+      <div class="tool-actions field-wide">
+        <button type="button" class="btn" id="lab-run">執行回測</button>
+        <button type="button" class="btn btn-quiet" id="lab-reset">重設</button>
+        <button type="button" class="btn btn-quiet" id="lab-save">儲存設定</button>
+        <button type="button" class="btn btn-quiet" id="lab-export">匯出結果</button>
+      </div>
+    </form>
+    <p class="tool-msg" id="lab-status" aria-live="polite">還沒執行。選好標的和策略後按「執行回測」。</p>
+
+    <div id="lab-results" hidden>
+      <h3 class="tool-sub">這次回測的條件</h3>
+      <div id="lab-sum"></div>
+      <h3 class="tool-sub">績效指標（策略 vs 同期買進持有）</h3>
+      <div class="bt-scroll" id="lab-kpi"></div>
+      <h3 class="tool-sub">權益曲線</h3>
+      <form class="lab-controls" onsubmit="return false">
+        <fieldset class="seg"><legend>座標</legend><label><input type="radio" name="lab-scale-r" value="linear" checked> 一般</label><label><input type="radio" name="lab-scale-r" value="log"> 對數</label></fieldset>
+        <fieldset class="seg"><legend>顏色</legend><label><input type="radio" name="lab-colors-r" value="tw" checked> 紅漲綠跌</label><label><input type="radio" name="lab-colors-r" value="us"> 綠漲紅跌</label></fieldset>
+        <select id="lab-scale" class="sr-only" aria-hidden="true"><option value="linear">linear</option><option value="log">log</option></select>
+        <select id="lab-colors" class="sr-only" aria-hidden="true"><option value="tw">tw</option><option value="us">us</option></select>
+      </form>
+      <div id="lab-equity"></div>
+      <h3 class="tool-sub">水下回撤曲線</h3>
+      <div id="lab-underwater"></div>
+      <h3 class="tool-sub" id="lab-monthly-title">月度報酬</h3>
+      <div class="bt-scroll" id="lab-monthly"></div>
+      <h3 class="tool-sub">每年報酬</h3>
+      <div class="bt-scroll" id="lab-yearly"></div>
+      <h3 class="tool-sub">滾動持有報酬（買進持有，資料不足會直接說）</h3>
+      <div class="bt-scroll" id="lab-rolling"></div>
+      <h3 class="tool-sub">交易明細</h3>
+      <label class="field">篩選（標的或原因）<input type="search" id="lab-trade-filter" placeholder="例如 SPY 或 停損"></label>
+      <p class="tool-hint" id="lab-trades-count"></p>
+      <div class="bt-scroll" id="lab-trades"></div>
+      <h3 class="tool-sub">定期定額比較</h3>
+      <div id="lab-dca"></div>
+      <h3 class="tool-sub">投資組合</h3>
+      <div id="lab-port"></div>
+      <h3 class="tool-sub">風險分析</h3>
+      <div id="lab-risk"></div>
+      <h3 class="tool-sub">進階研究</h3>
+      <div id="lab-adv"></div>
+      <h3 class="tool-sub">匯出</h3>
+      <p class="tool-desc">「匯出結果」會把策略設定、資料版本、區間、成本、指標、交易明細和風險警語打包成 JSON，交易明細另存 CSV；瀏覽器不允許下載時會放在下面的文字框。</p>
+      <textarea id="lab-export-text" class="backup-text" rows="8" hidden aria-label="匯出的報告"></textarea>
+    </div>
+  </section>
 
   <section class="tool" id="board" aria-labelledby="board-title">
     <h2 id="board-title">總覽</h2>
@@ -93,11 +219,12 @@
   <section class="tool" id="method" aria-labelledby="method-title">
     <h2 id="method-title">方法和限制</h2>
     <ul>
-      <li><b>資料。</b>Yahoo Finance 的日線，價格經過「還原」：配息、分割都調整進去，所以報酬是含息總報酬。標「不含息」的標的是暫時借用美股日報的未還原日 K，第一次自動更新後會換掉。</li>
+      <li><b>資料。</b>Yahoo Finance 的日線，價格經過「還原」：配息、分割都調整進去，所以報酬是含息總報酬。標「不含息」的標的是暫時借用美股日報的未還原日 K，報酬<b>不含配息</b>、不是含息總報酬，第一次自動更新後會換掉。</li>
       <li><b>成交。</b>訊號用當天收盤算，<b>隔天開盤</b>才買賣，不會偷看到當天收盤。買進持有是第一天開盤買。</li>
       <li><b>成本。</b><span id="bt-costs"></span>定期定額最後一天用市值計算，沒有扣賣出成本。</li>
       <li><b>指標。</b>年化波動＝每日報酬標準差 × √252；夏普值＝日報酬平均 × 252 ÷ 年化波動（無風險利率當 0）；Calmar＝年化報酬 ÷ 最大回檔；XIRR 和 Excel 同一套算法。</li>
       <li><b>限制。</b>只測了四種最常見的規則、沒有調參數，所以不會有「挑出最好看的那組」的問題；但也代表這不是在找最佳策略。不同標的歷史長度不同，不能直接互比。過去績效不代表未來；<a href="trend.html#predict">美股日報</a>「怎麼預測」有講為什麼均線規則會「以前有效、後來失效」。</li>
+      <li><b>進階模式。</b>在瀏覽器裡用 <code>js/backtest-engine.js</code> 重新計算，和產生這頁數字的 Python 引擎對過同一組資料（<code>tests/engine.test.js</code>）。可以改成本、停損、碎股、定期定額投入法、投資組合再平衡，也有參數敏感度、walk-forward、成本敏感度和 bootstrap；估值回測因為沒有當時可得的財報資料，標示為尚不可用。</li>
       <li><b>程式。</b>回測引擎在 <code>tools/backtest/</code>，有測試；設定在 <code>config/backtest.json</code>；每週由 GitHub Actions 重抓資料、重算、推回網站。</li>
     </ul>
   </section>
@@ -109,6 +236,9 @@
   <p>歷史股價來自 Yahoo Finance（還原後價格）；數字都標了資料區間。</p>
 </footer>
 <script src="data/backtest/results.js"></script>
+<script src="data/backtest/bars.js"></script>
+<script src="js/backtest-engine.js"></script>
 <script src="js/backtest.js"></script>
+<script src="js/backtest-lab.js"></script>
 </body>
 </html>

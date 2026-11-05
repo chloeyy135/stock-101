@@ -49,6 +49,12 @@ jobs:
       - name: 重跑回測
         run: python tools/run_backtest.py
 
+      - name: 匯出進階模式用的日線
+        run: python tools/export_bars.py
+
+      - name: 瀏覽器端引擎測試
+        run: node --test tests/engine.test.js
+
       - name: 推回分支
         run: |
           git config user.name "github-actions[bot]"
