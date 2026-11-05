@@ -51,7 +51,7 @@ trend.html        美股日報
 backtest.html     歷史回測（樣式在 css/backtest.css）
 js/backtest-engine.js 瀏覽器端回測引擎（進階模式用，和 Python 引擎對過帳；測試在 tests/engine.test.js）
 js/backtest-lab.js 回測頁進階模式的畫面
-data/backtest/    回測結果（results.js）、進階模式的日線資料（bars/index.js ＋ 每檔一個 js，由 tools/export_bars.py 產生）
+data/backtest/    回測結果（results/index.js ＋ 每檔一個 js，由 tools/run_backtest.py 產生）、進階模式的日線資料（bars/index.js ＋ 每檔一個 js，由 tools/export_bars.py 產生）
 css/style.css     樣式
 js/lessons.js     60 課的內容和資料來源（要改課文就改這裡）
 js/app.js         日期計算、已讀紀錄、課程畫面
@@ -62,6 +62,7 @@ js/trend.js       美股日報的畫面和預測日記
 data/us/          美股日 K、每天的日報和練習預測（格式和每天更新的步驟見 data/us/README.md）
 tools/us-daily.js 每天更新美股日報用的指令（node），網站本身不會用到
 tools/build-preview.py 把整個網站打包成一個 HTML 檔，給 claude.ai 的預覽用
+tools/import_yahoo_json.py 把 Yahoo Finance 日線的 JSON 匯出轉成 data/history 的 CSV 和 meta（沙盒裡抓資料用；GitHub Actions 走 fetch_history.py）
 tools/finmind_claude_analysis.py 用 FinMind 抓台股日線、交給 Claude 做技術面分析（需要 pip install anthropic FinMind 和 ANTHROPIC_API_KEY）
 ```
 

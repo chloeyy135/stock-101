@@ -1,4 +1,4 @@
-/* 台股入門 60 天 — 回測頁（只負責畫面；數字都在 data/backtest/results.js，由 tools/run_backtest.py 算好）。 */
+/* 台股入門 60 天 — 回測頁（只負責畫面；數字都在 data/backtest/results/（index.js ＋ 每檔一個 js），由 tools/run_backtest.py 算好）。 */
 (function () {
   'use strict';
 
@@ -31,7 +31,7 @@
     return c;
   }
   function label(id) { var s = R.results[id].symbol; return s.name + '（' + s.id.replace('.TW', '') + '）'; }
-  // 曲線在 results.js 裡是壓縮格式 { from, step, v, tail }（見 tools/backtest/report.py），這裡還原成 [[日期, 值], ...]
+  // 曲線在 results/<代號>.js 裡是壓縮格式 { from, step, v, tail }（見 tools/backtest/report.py），這裡還原成 [[日期, 值], ...]
   function expand(e) {
     if (!e || !e.v) return [];
     var t0 = Date.parse(e.from), pts = [];
