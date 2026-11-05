@@ -30,7 +30,7 @@
 - **全部課程目錄**：九週分組，已讀的課蓋「已讀」紅印章。
 - **看盤指南**（`guide.html`）：指標實驗室（用示意走勢點選 K 線，白話說明 MACD、KD、RSI、布林通道、均線、成交量），以及報價畫面、美股時段、分析師評級、看盤 App 的說明。
 - **美股日報**（`trend.html`）：每個美股交易日的隔天早上更新。用真的日 K 解釋 SPY（代表標普 500）、TSLA、GOOG、NVDA、AAPL、COST 的趨勢，每檔有電腦自動算的體檢表和 Claude 的解讀與情境；「怎麼預測」教基準率、趨勢、價位、行事曆、情境和失效點；預測日記會在 5 或 20 個交易日後自動對答案，Claude 自己的練習預測也一起記分；最後是台股觀察名單（台積電、台達電、日月光投控、鴻海、智邦）。
-- **歷史回測**（`backtest.html`）：用 Yahoo Finance 的還原後日線，對 0050、006208、0056、00878、台積電、SPY、QQQ、VT 和美股日報的五檔，跑四種規則：買進持有、每月定期定額、均線交叉（MA20／MA60）、年線濾網（MA200）。看年化報酬、最大回檔、夏普值、每年報酬、「任何一天進場抱 1／3／5／10 年」的最差和最好結果。訊號用收盤算、隔天開盤成交，台股含手續費和交易稅。每週六早上由 GitHub Actions 自動重抓、重算、推回來（`.github/workflows/backtest.yml`）；引擎在 `tools/backtest/`，設定在 `config/backtest.json`，說明見 `data/history/README.md`。
+- **歷史回測**（`backtest.html`）：用 Yahoo Finance 的還原後日線，對 0050、006208、0056、00878、台積電、SPY、QQQ、VT 和美股日報的五檔，跑四種規則：買進持有、每月定期定額、均線交叉（MA20／MA60）、年線濾網（MA200）。看年化報酬、最大回檔、夏普值、每年報酬、「任何一天進場抱 1／3／5／10 年」的最差和最好結果。訊號用收盤算、隔天開盤成交，台股含手續費和交易稅。「進階模式」在瀏覽器裡用同一套規則重新計算：可改策略參數、停損停利、手續費／交易稅／滑價、閒置現金利率、定期定額投入法、投資組合權重與再平衡，並有參數敏感度（訓練／驗證期分開）、walk-forward、成本敏感度、bootstrap 模擬與情境壓力測試；估值回測因為沒有當時可得的財報資料，標示為尚不可用。每週六早上由 GitHub Actions 自動重抓、重算、推回來（`.github/workflows/backtest.yml`）；引擎在 `tools/backtest/`，設定在 `config/backtest.json`，說明見 `data/history/README.md`。
 - **上一課／下一課**：每課底部都有；外接鍵盤的 iPad 也可以按左右方向鍵。
 - **實戰工具**（`tools.html`）：
   - 交易成本：手續費、交易稅、要付多少、損益兩平賣價。
@@ -49,6 +49,9 @@ tools.html        實戰工具
 guide.html        看盤指南
 trend.html        美股日報
 backtest.html     歷史回測（樣式在 css/backtest.css）
+js/backtest-engine.js 瀏覽器端回測引擎（進階模式用，和 Python 引擎對過帳；測試在 tests/engine.test.js）
+js/backtest-lab.js 回測頁進階模式的畫面
+data/backtest/    回測結果（results.js）、進階模式的日線資料（bars.js，由 tools/export_bars.py 產生）
 css/style.css     樣式
 js/lessons.js     60 課的內容和資料來源（要改課文就改這裡）
 js/app.js         日期計算、已讀紀錄、課程畫面

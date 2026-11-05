@@ -67,7 +67,7 @@
       if (id === state.sym) tr.className = 'is-active';
       var th = cell(tr, label(id) + (r.adjusted ? '' : ' 不含息'), '', true);
       th.scope = 'row';
-      cell(tr, r.first + '～' + r.last + '（' + num(r.results.buy_hold.metrics.years, 1) + ' 年）', 'note-cell');
+      cell(tr, r.first.slice(0, 7) + '～' + r.last.slice(0, 7) + '（' + num(r.results.buy_hold.metrics.years, 1) + ' 年）', 'note-cell');
       var bh = r.results.buy_hold.metrics;
       cell(tr, pct(bh.cagr), 'num ' + cls(bh.cagr));
       cell(tr, pct(bh.mdd), 'num ' + cls(bh.mdd));
@@ -117,9 +117,11 @@
     function Y(v) { var y = log ? Math.log(v) : v; return padT + (hi - y) / (hi - lo) * (H - padT - padB); }
     var svg = svgNode('svg', { viewBox: '0 0 ' + W + ' ' + H, width: '100%', height: H, class: 'bt-svg' }, container);
     // 橫格線
-    var ticks = 4;
-    for (var i = 0; i <= ticks; i++) {
-      var yv = lo + (hi - lo) * i / ticks, v = log ? Math.exp(yv) : yv, y = padT + (hi - yv) / (hi - lo) * (H - padT - padB);
+    // 刻度取「好看」的數字（1、2、2.5、5 的倍數），對數座標才平均分四格
+    var rawStep = (hi - lo) / 4, mag = Math.pow(10, Math.floor(Math.log10(rawStep)));
+    var step = log ? rawStep : [1, 2, 2.5, 5, 10].map(function (k) { return k * mag; }).filter(function (k) { return k >= rawStep; })[0];
+    for (var yv = log ? lo : Math.ceil(lo / step) * step; yv <= hi + 1e-9; yv += step) {
+      var v = log ? Math.exp(yv) : yv, y = padT + (hi - yv) / (hi - lo) * (H - padT - padB);
       svgNode('line', { x1: padL, x2: W - padR, y1: y, y2: y, class: 'bt-grid' }, svg);
       var txt = svgNode('text', { x: padL - 6, y: y + 4, class: 'bt-axis', 'text-anchor': 'end' }, svg);
       txt.textContent = opts && opts.fmt ? opts.fmt(v) : v.toFixed(2);
