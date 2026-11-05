@@ -51,7 +51,7 @@ trend.html        美股日報
 backtest.html     歷史回測（樣式在 css/backtest.css）
 js/backtest-engine.js 瀏覽器端回測引擎（進階模式用，和 Python 引擎對過帳；測試在 tests/engine.test.js）
 js/backtest-lab.js 回測頁進階模式的畫面
-data/backtest/    回測結果（results.js）、進階模式的日線資料（bars.js，由 tools/export_bars.py 產生）
+data/backtest/    回測結果（results.js）、進階模式的日線資料（bars/index.js ＋ 每檔一個 js，由 tools/export_bars.py 產生）
 css/style.css     樣式
 js/lessons.js     60 課的內容和資料來源（要改課文就改這裡）
 js/app.js         日期計算、已讀紀錄、課程畫面
