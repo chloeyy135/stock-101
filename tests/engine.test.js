@@ -142,7 +142,7 @@ test('Bootstrap 是可重現的統計模擬；情境只在資料涵蓋時計算'
   const eq = bars(geo(500, 0.0004)).map(x => ({ d: x.d, v: x.c }));
   const s1 = E.bootstrap(eq, { paths: 100, horizonDays: 60, seed: 7 }), s2 = E.bootstrap(eq, { paths: 100, horizonDays: 60, seed: 7 });
   assert.deepEqual(s1, s2); assert.ok(s1.ret.p5 <= s1.ret.p95);
-  const sc = E.scenarios(eq); // 2020-01 起 500 個交易日：涵蓋疫情急跌，不涵蓋金融海啸
+  const sc = E.scenarios(eq); // 2020-01 起 500 個交易日：涵蓋疫情急跌，不涵蓋金融海嘯
   assert.equal(sc.find(s => s.id === 'gfc').covered, false); assert.equal(sc.find(s => s.id === 'covid').covered, true);
   assert.ok(Number.isFinite(sc.find(s => s.id === 'covid').mdd));
 });
